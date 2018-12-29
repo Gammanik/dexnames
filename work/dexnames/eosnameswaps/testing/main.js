@@ -189,6 +189,7 @@ console.log('setting up eosjs ...');
 
 const myConfig = {
   expireInSeconds: 60,
+  keyProvider: "5KUaRLic6GNDrcmKCLx9dPS3QnAtsP2XaZUqJznQzZJZHQi7AZ4",
   broadcast: true,
   debug: false,
   sign: true,

@@ -47,7 +47,7 @@ module.exports = class Eos {
       name: action,
       authorization: [{
         actor: account,
-        permission: 'active'
+        permission: 'owner'
       }],
       data: dat
     };
