@@ -21,10 +21,6 @@ paymentaccnt - аккаунт на который нужно будет пере
 где accept - true/false обозначает его решение.
 
 Если продавец одобрил ставку, то покупателю посылается сообщение и он может перевести на контракт ту сумму, которую он предложил как ставку (вместо настоящей цены).
-
-
-
-extras_table - в ней хранятся данные о голосах для аккаунта для голосований
 <br /><br /><br />
 
 
@@ -150,3 +146,10 @@ executed transaction: 0f3c5c3bcc8a702f9c95874410d57cdaca43e64fc1ebfdb38cd657b2ea
 #  sellswapsln1 <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp: nameswapsln3"}
 #  gettingmoney <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp: nameswapsln3"}
 ```
+
+
+
+# Инфа по таблицам 
+
+extras_table - в ней хранятся данные о голосах для аккаунта для голосований
+bids - хранятся все ставки для всех имен и их статус (ACCEPTED/REJECTED)
