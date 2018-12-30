@@ -39,12 +39,10 @@ eosio-cpp -abigen [name.cpp] -o [name.wasm]
 eosio-abigen hello.cpp --contract=hello --output=hello.abi
 
 # the most activey used
-cleos set contract [eosio or $USERNAME] work/contracts/eosio.bios -p eosio
-cleos push action [smart_contract_acount] [action_name] '["randd"]' -p [public_key_of_sending_acc - eosio@active (?)]
+cleos set contract USERNAME work/contracts/eosio.bios -p eosio
 
 
 cleos push action eosio proposebid '{"account": "eosio", "action": "proposebid", "data": ""}' -p eosio
-cleos push action membrana create '["dev", 1, "feed cat"]' -p dev
 
 
 #publishing the shit
@@ -68,9 +66,12 @@ cleos --url https://api.main.alohaeos.com:443 push action arealgangsta screener 
 push action nameswapsln1 sell '[ "eosnameswap1", "10.0000 EOS", "eosnameswap3","Test"]' -p eosnameswap1@owner
 
 
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '[ "nameswapsln2", "1.0000 EOS", "gettingmoney","Test"]' -p nameswapsln2@owner
-
 cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln2@owner
+cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln3","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln3@owner
+
+
+cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '[ "nameswapsln2", "1.0000 EOS", "gettingmoney","Test"]' -p nameswapsln2@owner
+cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 proposebid '[ "nameswapsln2", "1.5000 EOS", "sellswapsln1"]' -p sellswapsln1@owner
 
 # Give contract permission to send actions
 cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln1","permission":"active","parent":"owner","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln1@owner

@@ -231,6 +231,10 @@
       "type": "updatesale",
       "ricardian_contract": ""
     },{
+      "name": "vote",
+      "type": "vote",
+      "ricardian_contract": ""
+    },{
       "name": "proposebid",
       "type": "proposebid",
       "ricardian_contract": ""

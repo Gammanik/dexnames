@@ -80,10 +80,11 @@ void eosnameswaps::sell(const sell_type &sell_data)
 
     // Place data in stats table. Contract pays for ram storage
     //todo: uncomment //-> cannot pass end iterator to modify
-//    auto itr_stats = _stats.find(0);
-//    _stats.modify(itr_stats, _self, [&](auto &s) {
-//        s.num_listed++;
-//    });
+
+    auto itr_stats = _stats.find(0);
+    _stats.modify(itr_stats, _self, [&](auto &s) {
+        s.num_listed++;
+    });
     
     // Send message
     send_message(sell_data.paymentaccnt, string("EOSNameSwaps: Your account ") + name{sell_data.account4sale}.to_string() + string(" has been listed for sale. Keep an eye out for bids, and don't forget to vote for accounts you like!"));
@@ -154,91 +155,12 @@ void eosnameswaps::buy(const transfer_type &transfer_data) {
     }
 }
 
-void eosnameswaps::buy_custom(const name account_name, const name from, const asset quantity, const string owner_key, const string active_key)
-{
-
-    // Account name length
-    int name_length = account_name.length();
-
-    // Extract suffix
-    string suffix = (account_name).to_string().substr(name_length - 2, 2);
-
-    // Currently supported suffixes
+void eosnameswaps::buy_custom(const name account_name, const name from, const asset quantity, const string owner_key, const string active_key) {
 
     //todo: add ".a" suffix instead
-    eosio_assert(suffix == ".e", "Custom Error: That is not a valid suffix.");
+    eosio_assert("true" == "false", "Suffix sale is not supported yet");
 
-    // Custom name saleprice
-    asset saleprice = asset(0, symbol("EOS", 4));
-
-    if (suffix == ".e")
-    {
-
-        switch (name_length)
-        {
-        case 7:
-            saleprice.amount = 57000;
-            break;
-        case 8:
-            saleprice.amount = 47000;
-            break;
-        case 9:
-            saleprice.amount = 37000;
-            break;
-        case 10:
-            saleprice.amount = 27000;
-            break;
-        case 11:
-            saleprice.amount = 17000;
-            break;
-        case 12:
-            saleprice.amount = 8000;
-            break;
-        default:
-            eosio_assert(1==0, "Custom Error: Incorrect custom name length");
-            break;
-        }
-
-    } 
-
-    // Check the correct amount has been transferred
-    eosio_assert(quantity == saleprice, "Custom Error: Wrong amount transferred.");
-
-    // Stats table index
-    uint64_t index = 0;
-    if (suffix == ".e") 
-    {
-        index = 1;
-    }
-
-
-    // Update stats table
-    _stats.modify(_stats.find(index), _self, [&](auto &s) {
-        s.num_purchased++;
-        s.tot_sales += saleprice;
-    });
-
-    // Account to transfer fees to + memo
-    name suffix_owner;
-    string memo;
-
-    if (suffix == ".x") {
-
-        suffix_owner = name("buyname.x");
-        memo = account_name.to_string() + "-" + owner_key + "-nameswapsfee"; 
-    
-    } else if (suffix == ".y" || suffix == ".z") {
-
-        suffix_owner = name("buyname.x");
-        memo = account_name.to_string() + "-" + owner_key;
-
-    } else if (suffix == ".e") {
-
-        suffix_owner = name("e");
-        memo = account_name.to_string() + "+" + owner_key + "+219959";
-
-    }
-
+    //todo: transfer back
     // Transfer funds to suffix owner
     action(
         permission_level{_self, name("active")},
@@ -247,8 +169,7 @@ void eosnameswaps::buy_custom(const name account_name, const name from, const as
         .send();
 }
 
-void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, const asset quantity, const string owner_key, const string active_key, const string referrer)
-{
+void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, const asset quantity, const string owner_key, const string active_key, const string referrer) {
 
     // ----------------------------------------------
     // Sale/Bid price
@@ -301,7 +222,7 @@ void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, con
     auto contractfee = asset(0, symbol("EOS", 4));
 
     // Fee amounts
-    contractfee.amount = int(saleprice.amount * contract_pc); //todo: contract_pc is 2%
+    contractfee.amount = int(saleprice.amount * contract_pc);
     sellerfee.amount = saleprice.amount - contractfee.amount;
 
     // Look up the referrer account
@@ -376,8 +297,7 @@ void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, con
 }
 
 // Action: Remove a listed account from sale
-void eosnameswaps::cancel(const cancel_type &cancel_data)
-{
+void eosnameswaps::cancel(const cancel_type &cancel_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -426,12 +346,7 @@ void eosnameswaps::cancel(const cancel_type &cancel_data)
 }
 
 // Action: Update the sale price
-void eosnameswaps::updatesale(const updatesale_type &updatesale_data)
-{
-
-    // ----------------------------------------------
-    // Auth checks
-    // ----------------------------------------------
+void eosnameswaps::updatesale(const updatesale_type &updatesale_data) {
 
     // Check an account with that name is listed for sale
     auto itr_accounts = _accounts.find(updatesale_data.account4sale.value);
@@ -472,13 +387,7 @@ void eosnameswaps::updatesale(const updatesale_type &updatesale_data)
 }
 
 // Action: Increment votes
-void eosnameswaps::vote(const vote_type &vote_data)
-{
-
-    // ----------------------------------------------
-    // Auth checks
-    // ----------------------------------------------
-
+void eosnameswaps::vote(const vote_type &vote_data) {
     // Confirm the voter is who they say they are
     eosio_assert(has_auth(vote_data.voter), "Vote Error: You are not who you say you are. Check permissions.");
 
@@ -505,8 +414,7 @@ void eosnameswaps::vote(const vote_type &vote_data)
 }
 
 // Action: Register Referrer
-void eosnameswaps::regref(const regref_type &regref_data)
-{
+void eosnameswaps::regref(const regref_type &regref_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -533,8 +441,7 @@ void eosnameswaps::regref(const regref_type &regref_data)
 }
 
 // Action: Propose a bid for an account
-void eosnameswaps::proposebid(const proposebid_type &proposebid_data)
-{
+void eosnameswaps::proposebid(const proposebid_type &proposebid_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -579,8 +486,7 @@ void eosnameswaps::proposebid(const proposebid_type &proposebid_data)
 }
 
 // Action: Accept or decline a bid for an account
-void eosnameswaps::decidebid(const decidebid_type &decidebid_data)
-{
+void eosnameswaps::decidebid(const decidebid_type &decidebid_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -636,8 +542,7 @@ void eosnameswaps::decidebid(const decidebid_type &decidebid_data)
 }
 
 // Message Action
-void eosnameswaps::message(const message_type &message_data)
-{
+void eosnameswaps::message(const message_type &message_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -653,22 +558,13 @@ void eosnameswaps::message(const message_type &message_data)
 }
 
 // Action: Perform admin tasks
-void eosnameswaps::screener(const screener_type &screener_data)
-{
-
-    // ----------------------------------------------
-    // Auth checks
-    // ----------------------------------------------
+void eosnameswaps::screener(const screener_type &screener_data) {
 
     // Only the contract account can perform screening
     require_auth(_self);
 
-    // ----------------------------------------------
     // Set the screening status of an account listed for sale
-    // ----------------------------------------------
-
     int screened = screener_data.option;
-
     eosio_assert(screened == 0 || screened == 1, "Admin Error: Malformed screening data.");
 
     // Place data in table. Contract pays for ram storage
@@ -681,7 +577,7 @@ void eosnameswaps::screener(const screener_type &screener_data)
 }
 
 // Init the stats table
-void eosnameswaps::initstats() {
+void eosnameswaps::initstats() { //todo: is this not called
 
     // ----------------------------------------------
     // Auth checks
@@ -713,8 +609,7 @@ void eosnameswaps::initstats() {
 }
 
 // Broadcast message
-void eosnameswaps::send_message(name receiver, string message)
-{
+void eosnameswaps::send_message(name receiver, string message) {
 
     action(permission_level{_self, name("active")},
            name("nameswapsln1"), name("message"), //todo: change to the contract owner's name
@@ -725,8 +620,7 @@ void eosnameswaps::send_message(name receiver, string message)
 }
 
 // Changes the owner/active permissions
-void eosnameswaps::account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey_str)
-{
+void eosnameswaps::account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey_str) {
 
     // Setup authority for contract. Choose either a new key, or account, or both.
     authority contract_authority;

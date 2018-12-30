@@ -150,7 +150,9 @@ class [[eosio::contract]] eosnameswaps : public contract
     const uint16_t BID_ACCEPTED = 2;
 
     // Constructor
-    eosnameswaps(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds), _accounts(_self,_self.value), _extras(_self,_self.value), _bids(_self,_self.value), _stats(_self, _self.value), _referrer(_self, _self.value)  {}
+    eosnameswaps(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds), _accounts(_self,_self.value), _extras(_self,_self.value), _bids(_self,_self.value), _stats(_self, _self.value), _referrer(_self, _self.value)  {
+
+    }
 
     // Buy (transfer) action
     void buy(const transfer_type &transfer_data);
@@ -208,7 +210,7 @@ class [[eosio::contract]] eosnameswaps : public contract
     const float referrer_pc = 0.10;
 
     // Fees Accounts
-    name feesaccount = name("nameswapsfee");
+    name feesaccount = name("nameswapsfee"); //todo: set the desired account at this place
 
     // struct for account table
     struct account_table
