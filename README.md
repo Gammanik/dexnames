@@ -67,7 +67,7 @@ stats_table - для статистики внутри контракта     st
 
 А еще нужно дать контракту разрешение отправлять actions. Разрешить самому себе. Без этого не работало крч
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln1","permission":"active","parent":"owner","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln1@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln1","permission":"active","parent":"owner","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln1@owner
 ```
 
 
@@ -77,9 +77,9 @@ cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 pu
 ```
 <br /><br />
 
-**Продажа аккаунта:**
+**Продажа аккаунта:** (продаем аккаунт nameswapsln3)
 ```
- cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '[ "nameswapsln3", "2.0000 EOS", "gettingmoney","Test"]' -p nameswapsln3@owner
+ cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '{ "account4sale":"nameswapsln3", "saleprice":"2.0000 EOS", "paymentaccnt":"gettingmoney","message":"Test"}' -p nameswapsln3@owner
 ```
 Ответ:
 ```
@@ -90,10 +90,17 @@ executed transaction: 8af0ff21946d0de06a005a9abf4b56e1dc0e6e52705ec339c27f0316b3
 #  nameswapsln1 <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: Your account nameswapsln3 has been listed for sa...
 #  gettingmoney <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: Your account nameswapsln3 has been listed for sa...
 ```
+<br /> <br />
+
+**Отмена выставления аккаунта на продажу** (для него нужно авторизироваться с помощью аккаунта, который был указан как получающий деньги)
+```
+cleos --url http://jungle2.cryptolions.io:80 push action nameswapsln1 cancel '{"account4sale":"nameswapsln2", "owner_key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M", "active_key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M"}' -p gettingmoney@owner
+```
+<br /> <br />
 
 **Показать на данный момент продающиеся аккаунты**
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 get table nameswapsln1 eosnameswaps accounts
+cleos --url http://jungle2.cryptolions.io:80 get table nameswapsln1 eosnameswaps accounts
 ```
 <br /> <br />
 
@@ -119,7 +126,7 @@ cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 pu
 
 
 
-**Покупка аккаунта:: WARNING!!! еще нормально не протестирована**
+**Покупка аккаунта::
 ```
 cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '[ "sellswap1", "gettingmoney", "1.5000 EOS", "sp:nameswapsln3"]' -p sellswapsln@active
 ```
@@ -146,7 +153,7 @@ executed transaction: 0f3c5c3bcc8a702f9c95874410d57cdaca43e64fc1ebfdb38cd657b2ea
 #  sellswapsln1 <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp: nameswapsln3"}
 #  gettingmoney <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp: nameswapsln3"}
 ```
-
+<br /> <br />
 
 
 # Инфа по таблицам 
