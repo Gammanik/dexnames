@@ -77,6 +77,7 @@ cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 pu
 ```
 <br /><br />
 
+
 **Продажа аккаунта:** (продаем аккаунт nameswapsln3)
 ```
  cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '{ "account4sale":"nameswapsln3", "saleprice":"2.0000 EOS", "paymentaccnt":"gettingmoney","message":"Test"}' -p nameswapsln3@owner
@@ -92,11 +93,33 @@ executed transaction: 8af0ff21946d0de06a005a9abf4b56e1dc0e6e52705ec339c27f0316b3
 ```
 <br /> <br />
 
-**Отмена выставления аккаунта на продажу** (для него нужно авторизироваться с помощью аккаунта, который был указан как получающий деньги)
+
+**Отмена выставления аккаунта на продажу** (для него нужно авторизироваться с помощью аккаунта, который был указан как получающий деньги - gettingmoney)
 ```
 cleos --url http://jungle2.cryptolions.io:80 push action nameswapsln1 cancel '{"account4sale":"nameswapsln2", "owner_key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M", "active_key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M"}' -p gettingmoney@owner
 ```
-<br /> <br />
+```
+executed transaction: 357a6110b573a4b1ece9b186d40b1b3a357f9a0d7a01271a6f9b597149e0d7f2  208 bytes  1195 us
+#  nameswapsln1 <= nameswapsln1::cancel         {"account4sale":"nameswapsln2","owner_key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","...
+#         eosio <= eosio::updateauth            {"account":"nameswapsln2","permission":"active","parent":"owner","auth":{"threshold":1,"keys":[{"key...
+#         eosio <= eosio::updateauth            {"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold":1,"keys":[{"key":"EOS...
+#  nameswapsln1 <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: You have successfully cancelled the sale of the ...
+#  gettingmoney <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: You have successfully cancelled the sale of the ...
+```
+<br/> <br/>
+
+**Обновление продажи аккаунта** (поменять цену или сообщение. paymentaccnt - менять нельзя. авторизаци я с помощью paymentaccnt: 'gettingmoney')
+```
+cleos  --url http://jungle2.cryptolions.io:80 push action nameswapsln1 updatesale '{ "account4sale":"nameswapsln2", "saleprice":"5.5000 EOS", "message":"Test2"}' -p gettingmoney 
+```
+```
+executed transaction: 058ad1d200d3c6fb70c3f7a852fbd1e360d507ac4d6d4cd556065c66811d460a  128 bytes  994 us
+#  nameswapsln1 <= nameswapsln1::updatesale     {"account4sale":"nameswapsln2","saleprice":"5.5000 EOS","message":"Test2"}
+#  nameswapsln1 <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: You have successfully updated the sale of the ac...
+#  gettingmoney <= nameswapsln1::message        {"receiver":"gettingmoney","message":"EOSNameSwaps: You have successfully updated the sale of the ac...
+
+```
+<br/> <br/><br/>
 
 **Показать на данный момент продающиеся аккаунты**
 ```
