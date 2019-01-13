@@ -72,14 +72,14 @@ cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"acc
 
 Перед совершением продажи аккаунта нужно обновить permissions. Здесь nameswapsln2 - аккаунт, который мы продаем. nameswapsln1 -  аккаунт, на котором расположен смарт-контракт.
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln2@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln2@owner
 ```
 <br /><br />
 
 
 **Продажа аккаунта:** (продаем аккаунт nameswapsln3)
 ```
- cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '{ "account4sale":"nameswapsln3", "saleprice":"2.0000 EOS", "paymentaccnt":"gettingmoney","message":"Test"}' -p nameswapsln3@owner
+ cleos --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '{ "account4sale":"nameswapsln3", "saleprice":"2.0000 EOS", "paymentaccnt":"gettingmoney","message":"Test"}' -p nameswapsln3@owner
 ```
 Ответ:
 ```
@@ -128,7 +128,7 @@ cleos --url http://jungle2.cryptolions.io:80 get table nameswapsln1 eosnameswaps
 
 **Предложить ставку:**
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 proposebid '[ "nameswapsln2", "1.5000 EOS", "sellswapsln1"]' -p sellswapsln1@owner
+cleos --url http://jungle2.cryptolions.io:80 push action nameswapsln1 proposebid '[ "nameswapsln2", "1.5000 EOS", "sellswapsln1"]' -p sellswapsln1@owner
 ```
 Ответ:
 ```
@@ -142,7 +142,7 @@ executed transaction: fa20b73a85163860a45326d43f12971da4e05b9ef4cb7456547c396625
 
 **Продавец определяет что ему делать с предложенной ставкой::**
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 decidebid '[ "nameswapsln3", true]'  -p gettingmoney@owner
+cleos --url http://jungle2.cryptolions.io:80 push action nameswapsln1 decidebid '[ "nameswapsln3", true]'  -p gettingmoney@owner
 ```
 <br/> <br/> <br/>
 
@@ -150,7 +150,7 @@ cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 pu
 
 **Покупка аккаунта::
 ```
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '[ "sellswap1", "gettingmoney", "1.5000 EOS", "sp:nameswapsln3"]' -p sellswapsln@active
+cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '[ "sellswap1", "gettingmoney", "1.5000 EOS", "sp:nameswapsln3"]' -p sellswapsln@active
 ```
 Ответ::
 ```
@@ -160,7 +160,7 @@ Error Details:
 transaction declares authority '{"actor":"sellswapsln","permission":"active"}', but does not have signatures for it.
 root@keosd:/work/dexnames# 
 root@keosd:/work/dexnames# 
-root@keosd:/work/dexnames# cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '[ "sellswapsln1", "gettingmoney", "1.5000 EOS", "sp:nameswapsln3"]' -p sellswapsln1@active
+root@keosd:/work/dexnames# cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '[ "sellswapsln1", "gettingmoney", "1.5000 EOS", "sp:nameswapsln3"]' -p sellswapsln1@active
 executed transaction: 909adc469a7453aec179ca2bb05f971635535a736ec4eb725d1345318c9a4a7f  144 bytes  628 us
 #   eosio.token <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp:nameswapsln3"}
 #  sellswapsln1 <= eosio.token::transfer        {"from":"sellswapsln1","to":"gettingmoney","quantity":"1.5000 EOS","memo":"sp:nameswapsln3"}
