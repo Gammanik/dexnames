@@ -57,8 +57,10 @@ void eosnameswaps::sell(const sell_type &sell_data)
     // Place data in accounts table. Seller pays for ram storage
     _accounts.emplace(sell_data.account4sale, [&](auto &s) {
         s.account4sale = sell_data.account4sale;
+        s.guid = sell_data.guid;
         s.saleprice = sell_data.saleprice;
         s.paymentaccnt = sell_data.paymentaccnt;
+        s.created_at = now();
     });
 
     // Place data in extras table. Seller pays for ram storage
@@ -79,8 +81,6 @@ void eosnameswaps::sell(const sell_type &sell_data)
     });
 
     // Place data in stats table. Contract pays for ram storage
-    //todo: uncomment //-> cannot pass end iterator to modify
-
     auto itr_stats = _stats.find(0);
     _stats.modify(itr_stats, _self, [&](auto &s) {
         s.num_listed++;
@@ -151,25 +151,20 @@ void eosnameswaps::buy(const transfer_type &transfer_data) {
     }
     else if (buy_code == "sp:")
     {
-        buy_saleprice(account_name, transfer_data.from, transfer_data.quantity, owner_key, active_key, referrer);
+        buy_saleprice(account_name, transfer_data.from, transfer_data.to, transfer_data.quantity, owner_key, active_key, referrer);
     }
 }
 
 void eosnameswaps::buy_custom(const name account_name, const name from, const asset quantity, const string owner_key, const string active_key) {
 
     //todo: add ".a" suffix instead
-    eosio_assert("true" == "false", "Suffix sale is not supported yet");
+    eosio_assert(true == false, "Suffix sale is not supported yet");
 
     //todo: transfer back
-    // Transfer funds to suffix owner
-    action(
-        permission_level{_self, name("active")},
-        name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, suffix_owner, saleprice, memo))
-        .send();
+    // Transfer the funds back to the suffix 'from' account?
 }
 
-void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, const asset quantity, const string owner_key, const string active_key, const string referrer) {
+void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer) {
 
     // ----------------------------------------------
     // Sale/Bid price
@@ -292,8 +287,21 @@ void eosnameswaps::buy_saleprice(const name account_to_buy, const name from, con
         s.tot_fees += contractfee;
     });
 
+    // Place data in sold_names table
+    _sold.emplace(account_to_buy, [&](auto &s) {
+        s.guid = itr_accounts->guid;
+        s.account4sale = account_to_buy; // todo: change name to accountsold
+        s.saleprice = saleprice;
+        s.paymentaccnt = to;
+        s.buyer = from;
+        s.sold_at = now();
+    });
+
+
+    //todo: could be a problem with sending a message
     // Send message
-    send_message(from, string("EOSNameSwaps: You have successfully bought the account ") + name{account_to_buy}.to_string() + string(". Please come again."));
+    send_message(from, string("eosnamesbids: You have successfully bought the account ") + name{account_to_buy}.to_string()
+    + string("From: ") + itr_accounts->paymentaccnt.to_string() + string("With the price:") + itr_accounts->saleprice.to_string() + string(". Please come again."));
 }
 
 // Action: Remove a listed account from sale
@@ -304,7 +312,8 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     // ----------------------------------------------
 
     // Check an account with that name is listed for sale
-    auto itr_accounts = _accounts.find(cancel_data.account4sale.value);
+    auto itr_accounts = _accounts.find(cancel_data.guid);
+
     eosio_assert(itr_accounts != _accounts.end(), "Cancel Error: That account name is not listed for sale");
 
     // Only the payment account can cancel the sale (the contract has the owner key)
@@ -315,10 +324,10 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     // ----------------------------------------------
 
     // Change auth from contract@active to submitted active key
-    account_auth(cancel_data.account4sale, itr_accounts->paymentaccnt, name("active"), name("owner"), cancel_data.active_key_str);
+    account_auth(itr_accounts->account4sale, itr_accounts->paymentaccnt, name("active"), name("owner"), cancel_data.active_key_str);
 
     // Change auth from contract@owner to submitted owner key
-    account_auth(cancel_data.account4sale, itr_accounts->paymentaccnt, name("owner"), name(""), cancel_data.owner_key_str);
+    account_auth(itr_accounts->account4sale, itr_accounts->paymentaccnt, name("owner"), name(""), cancel_data.owner_key_str);
 
     // ----------------------------------------------
     // Cleanup
@@ -328,11 +337,11 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     _accounts.erase(itr_accounts);
 
     // Erase account from the extras table
-    auto itr_extras = _extras.find(cancel_data.account4sale.value);
+    auto itr_extras = _extras.find(itr_accounts->account4sale.value);
     _extras.erase(itr_extras);
 
     // Erase account from the bids table
-    auto itr_bids = _bids.find(cancel_data.account4sale.value);
+    auto itr_bids = _bids.find(itr_accounts->account4sale.value);
     _bids.erase(itr_bids);
 
     // Place data in stats table. Contract pays for ram storage
@@ -342,7 +351,7 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     });
 
     // Send message
-    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: You have successfully cancelled the sale of the account ") + name{cancel_data.account4sale}.to_string() + string(". Please come again."));
+    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: You have successfully cancelled the sale of the account ") + name{itr_accounts->account4sale}.to_string() + string(". Please come again."));
 }
 
 // Action: Update the sale price
@@ -612,7 +621,7 @@ void eosnameswaps::initstats() { //todo: is this not called
 void eosnameswaps::send_message(name receiver, string message) {
 
     action(permission_level{_self, name("active")},
-           name("nameswapsln1"), name("message"), //todo: change to the contract owner's name
+           name("nameswapsab1"), name("message"), //todo: change to the contract owner's name
            std::make_tuple(
                receiver,
                message))
