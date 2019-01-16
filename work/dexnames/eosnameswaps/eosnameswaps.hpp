@@ -197,10 +197,10 @@ class [[eosio::contract]] eosnameswaps : public contract
     void initstats();
 
     // Buy an account listed for sale
-    void buy_saleprice(const name account_to_buy, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer);
+    void buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer);
 
     // Buy custom accounts
-    void buy_custom(const name account_name, const name from, const asset quantity, const string owner_key, const string active_key);
+    void buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key);
 
     // Update the auth for account4sale
     void account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey);
