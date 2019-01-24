@@ -81,7 +81,7 @@ struct proposebid_type
 
 struct decidebid_type
 {
-    name account4sale;
+    uint64_t guid;
     bool accept;
 };
 
@@ -294,6 +294,9 @@ class [[eosio::contract]] eosnameswaps : public contract
     // Struct for bids table
     struct bids_table
     {
+        // The id of the auction bid belongs to
+        uint64_t guid;
+
         // Name of account being sold
         name account4sale;
 
@@ -303,10 +306,13 @@ class [[eosio::contract]] eosnameswaps : public contract
         // The bid price
         asset bidprice;
 
+        // The account selling the name to watch 'my auctions'
+        name paymentaccnt;
+
         // The account making the bid
         name bidder;
 
-        uint64_t primary_key() const { return account4sale.value; }
+        uint64_t primary_key() const { return guid; }
     };
 
     eosio::multi_index<name("bids"), bids_table> _bids;
