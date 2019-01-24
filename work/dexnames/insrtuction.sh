@@ -30,7 +30,7 @@ cleos wallet import --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79z
 # cleos get accounts [public key of imported wallet]
 # cleos wallet unlock [master-password PW5J6DKtpNDSjwDC3nuoNfGgGULxfPcNBKNJu47Lu57ZjABWwRDNb]
 cleos --url  https://api.main.alohaeos.com:443 get account eosnamesbids
-cleos --url https://api.main.alohaeos.com:443 set contract eosnamesbids  ./eosnameswaps/
+cleos --url http://jungle2.cryptolions.io:80 set contract nameswapsac1  ./eosnameswaps/
 # cleos create account eosio user [pub_key pub_key]
 
 

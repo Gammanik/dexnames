@@ -258,8 +258,6 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
     // ----------------------------------------------
 
     // todo: here we are getting the empty active and owner key
-    // todo: because in sell we are not
-
     // Remove contract@owner permissions and replace with buyer@active account and the supplied key
     account_auth(itr_accounts->account4sale, from, name("active"), name("owner"), active_key);
 
@@ -286,11 +284,11 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
     // Place data in sold_names table
     _sold.emplace(_self, [&](auto &s) {
         s.guid = auction_guid;
-        s.account4sale = itr_accounts->account4sale; // todo: is it deleted for now?
+        s.account4sale = itr_accounts->account4sale;
         s.saleprice = saleprice;
         s.paymentaccnt = itr_accounts->paymentaccnt;
         s.buyer = from;
-        s.sold_at = now();
+        s.sold_at = now(); // todo: debug now: send message with now()?
     });
 
 
@@ -409,6 +407,8 @@ void eosnameswaps::vote(const vote_type &vote_data) {
     // ----------------------------------------------
     // Valid transaction checks
     // ----------------------------------------------
+    // todo: find a way for not searching in the _accounts table
+    // todo: add guid to the extra table?
 
     // Check an account with that name is listed for sale
     auto itr_extras = _extras.find(vote_data.account4sale.value);
@@ -469,9 +469,13 @@ void eosnameswaps::proposebid(const proposebid_type &proposebid_data) {
     // Valid transaction checks
     // ----------------------------------------------
 
+
+    auto itr_accounts = _accounts.find(proposebid_data.guid);
+    eosio_assert(itr_accounts != _accounts.end(), "Propose Bid Error: That account name is not listed for sale");
+
     // Check an account with that name is listed for sale
-    auto itr_bids = _bids.find(proposebid_data.account4sale.value);
-    eosio_assert(itr_bids != _bids.end(), "Propose Bid Error: That account name is not listed for sale");
+    auto itr_bids = _bids.find(itr_accounts->account4sale.value); // todo: get to know the account4sale
+
 
     // Check the transfer is valid
     eosio_assert(proposebid_data.bidprice.symbol == symbol("EOS", 4), "Propose Bid Error: Bid price must be in EOS. Ex: '10.0000 EOS'.");
@@ -482,7 +486,6 @@ void eosnameswaps::proposebid(const proposebid_type &proposebid_data) {
     eosio_assert(proposebid_data.bidprice > itr_bids->bidprice, "Propose Bid Error: You must bid higher than the last bidder.");
 
     // Only accept new bids if they are lower than the sale price
-    auto itr_accounts = _accounts.find(proposebid_data.account4sale.value);
     eosio_assert(proposebid_data.bidprice <= itr_accounts->saleprice, "Propose Bid Error: You must bid lower than the sale price.");
 
     // ----------------------------------------------
@@ -497,7 +500,7 @@ void eosnameswaps::proposebid(const proposebid_type &proposebid_data) {
     });
 
     // Send message
-    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: Your account ") + name{proposebid_data.account4sale}.to_string() + string(" has received a bid. If you choose to accept it, the bidder can purchase the account at the lower price. Others can still bid higher or pay the full sale price until then."));
+    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: Your account ") + name{itr_accounts->account4sale}.to_string() + string(" has received a bid. If you choose to accept it, the bidder can purchase the account at the lower price. Others can still bid higher or pay the full sale price until then."));
 }
 
 // Action: Accept or decline a bid for an account

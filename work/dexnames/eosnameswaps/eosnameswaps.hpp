@@ -74,7 +74,7 @@ struct vote_type
 
 struct proposebid_type
 {
-    name account4sale;
+    uint64_t guid;
     asset bidprice;
     name bidder;
 };
