@@ -303,11 +303,8 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
         s.tot_fees += contractfee;
     });
 
-
-    //todo: could be a problem with sending a message
-    // Send message
     send_message(from, string("eosnamesbids: You have successfully bought the account ") + itr_accounts->account4sale.to_string()
-    + string(" from: ") + itr_accounts->paymentaccnt.to_string() + string(" with the price:") + itr_accounts->saleprice.to_string() + string(". Please come again."));
+    + string(" from: ") + itr_accounts->paymentaccnt.to_string() + string(" with the price:") + saleprice.to_string() + string(". Please come again."));
 }
 
 // Action: Remove a listed account from sale

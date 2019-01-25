@@ -193,8 +193,8 @@
       "name": "decidebid",
       "base": "",
       "fields": [{
-          "name": "account4sale",
-          "type": "name"
+          "name": "guid",
+          "type": "uint64"
         },{
           "name": "accept",
           "type": "bool"
