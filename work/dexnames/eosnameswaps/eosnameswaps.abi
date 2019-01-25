@@ -6,6 +6,9 @@
       "name": "account_table",
       "base": "",
       "fields": [{
+          "name": "guid",
+          "type": "uint64"
+        }{
           "name": "account4sale",
           "type": "name"
         },{
@@ -14,6 +17,29 @@
         },{
           "name": "paymentaccnt",
           "type": "name"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "sold_table",
+      "base": "",
+      "fields": [{
+          "name": "guid",
+          "type": "uint64"
+        }{
+          "name": "account4sale",
+          "type": "name"
+        },{
+          "name": "saleprice",
+          "type": "asset"
+        },{
+          "name": "paymentaccnt",
+          "type": "name"
+        },{
+          "name": "sold_at",
+          "type": "uint64"
         }
       ]
     },{
@@ -40,6 +66,9 @@
       "name": "bids_table",
       "base": "",
       "fields": [{
+          "name": "guid",
+          "type": "uint64"
+        }{
           "name": "account4sale",
           "type": "name"
         },{
@@ -48,6 +77,9 @@
         },{
           "name": "bidprice",
           "type": "asset"
+        },{
+          "name": "paymentaccnt",
+          "type": "name"
         },{
           "name": "bidder",
           "type": "name"
@@ -88,6 +120,9 @@
       "name": "sell",
       "base": "",
       "fields": [{
+          "name": "guid",
+          "type": "uint64"
+        },{
           "name": "account4sale",
           "type": "name"
         },{
@@ -105,8 +140,8 @@
       "name": "cancel",
       "base": "",
       "fields": [{
-          "name": "account4sale",
-          "type": "name"
+          "name": "guid",
+          "type": "uint64"
         },{
           "name": "owner_key",
           "type": "string"
@@ -119,8 +154,8 @@
       "name": "updatesale",
       "base": "",
       "fields": [{
-          "name": "account4sale",
-          "type": "name"
+          "name": "guid",
+          "type": "uint64"
         },{
           "name": "saleprice",
           "type": "asset"
@@ -144,8 +179,8 @@
       "name": "proposebid",
       "base": "",
       "fields": [{
-          "name": "account4sale",
-          "type": "name"
+          "name": "guid",
+          "type": "uint64"
         },{
           "name": "bidprice",
           "type": "asset"
@@ -158,8 +193,8 @@
       "name": "decidebid",
       "base": "",
       "fields": [{
-          "name": "account4sale",
-          "type": "name"
+          "name": "guid",
+          "type": "uint64"
         },{
           "name": "accept",
           "type": "bool"
@@ -268,12 +303,22 @@
       "name": "accounts",
       "index_type": "i64",
       "key_names": [
-        "name"
+        "primary_key"
       ],
       "key_types": [
-        "name"
+        "i64"
       ],
       "type": "account_table"
+    },{
+      "name": "sold",
+      "index_type": "i64",
+      "key_names": [
+        "primary_key"
+      ],
+      "key_types": [
+        "i64"
+      ],
+      "type": "sold_table"
     },{
       "name": "extras",
       "index_type": "i64",

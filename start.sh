@@ -20,13 +20,12 @@ alias cleos='docker-compose exec keosd /opt/eosio/bin/cleos -u http://nodeosd:88
 
 
 cleos wallet create --to-console
-# master password: PW5J6DKtpNDSjwDC3nuoNfGgGULxfPcNBKNJu47Lu57ZjABWwRDNb
+# master password: PW5JEK93smEwGYaa2gMmG73gED3QzFznpJut7YxSHc69LLSP1NZtd
 
 cleos create key  --to-console
 # Private key: 5JV6wdAxByYn8eCyi2YZYAnBCFfJgDwLhbxVy1ktMBMBGVkb4pE
 # Public key: EOS52Jd9aMVEUgYHafjdN5EJd8N1LLMVf7CLgoFQ64AQ31jEbX4Mf
 
-cleos wallet import [private key]
 
 # private-key for eosio
 cleos wallet import --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3

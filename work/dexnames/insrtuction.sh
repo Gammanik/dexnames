@@ -14,7 +14,7 @@ alias cleos='docker-compose exec keosd /opt/eosio/bin/cleos -u http://nodeosd:88
 
 # REG USER::
 cleos wallet create --to-console
-# cleos wallet unlock --password PW5Kf11xWoGUxzwgRfUWFcnUEqxacXffbeAwvVYzxBygNAssCuNzA
+# cleos wallet unlock --password PW5Hr47cEc6PJmzcxAxjZGtcAP955Geja54hPCjaq651dPN3PfoRz
 
 
 
@@ -29,7 +29,8 @@ cleos wallet import --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79z
 # cleos wallet keys 
 # cleos get accounts [public key of imported wallet]
 # cleos wallet unlock [master-password PW5J6DKtpNDSjwDC3nuoNfGgGULxfPcNBKNJu47Lu57ZjABWwRDNb]
-cleos --wallet-url http://0.0.0.0:9876/ --url  https://api.main.alohaeos.com:443 get account eosnamesbids
+cleos --url  https://api.main.alohaeos.com:443 get account eosnamesbids
+cleos --url http://jungle2.cryptolions.io:80 set contract nameswapsac1  ./eosnameswaps/
 # cleos create account eosio user [pub_key pub_key]
 
 
@@ -53,9 +54,9 @@ cleos --url https://api.main.alohaeos.com:443  set contract eosnamesbids ./eosna
 
 
 
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 get info
-cleos --wallet-url http://0.0.0.0:9876 --url  https://api.main.alohaeos.com:443 get account arealgangsta
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80  set contract arealgangsta ./eosnameswaps/
+cleos --url http://jungle2.cryptolions.io:80 get info
+cleos --url  https://api.main.alohaeos.com:443 get account arealgangsta
+cleos --url http://jungle2.cryptolions.io:80  set contract arealgangsta ./eosnameswaps/
 cleos --url https://api.main.alohaeos.com:443 push action arealgangsta screener '["eosnameswap1",1]'  -p arealgangsta
 
 
@@ -66,15 +67,18 @@ cleos --url https://api.main.alohaeos.com:443 push action arealgangsta screener 
 push action nameswapsln1 sell '[ "eosnameswap1", "10.0000 EOS", "eosnameswap3","Test"]' -p eosnameswap1@owner
 
 
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln2@owner
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln3","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln3@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln2","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln2@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln3","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln3@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln4","permission":"owner","parent":"","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln4@owner
 
 
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '[ "nameswapsln2", "1.0000 EOS", "gettingmoney","Test"]' -p nameswapsln2@owner
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action nameswapsln1 proposebid '[ "nameswapsln2", "1.5000 EOS", "sellswapsln1"]' -p sellswapsln1@owner
+cleos  --u http://jungle2.cryptolions.io:80 push action nameswapsln1 sell '[ "nameswapsln2", "1.0000 EOS", "gettingmoney","Test"]' -p nameswapsln2@owner
+cleos --u http://jungle2.cryptolions.io:80 push action nameswapsln1 proposebid '[ "nameswapsln2", "1.5000 EOS", "sellswapsln1"]' -p sellswapsln1@owner
+
+cleos  --u http://jungle2.cryptolions.io:80 push action nameswapsln1 updatesale '{ "account4sale":"nameswapsln2", "saleprice":"5.5000 EOS", "message":"Test2"}' -p nameswapsln2@active
 
 # Give contract permission to send actions
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsln1","permission":"active","parent":"owner","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsln1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsln1@owner
+cleos --url http://jungle2.cryptolions.io:80 push action eosio updateauth '{"account":"nameswapsab1","permission":"active","parent":"owner","auth":{"threshold": 1,"keys": [{"key":"EOS8g6Eb7nixavjSaKh3PSseDu5Az47Xhy2QN52h42KzNmH8FqR2M","weight":1}],"waits":[],"accounts": [{"permission":{"actor":"nameswapsab1","permission":"eosio.code"},"weight":1}]}}' -p nameswapsab1@owner
 
 
-cleos --wallet-url http://0.0.0.0:9876 --url http://jungle2.cryptolions.io:80 get table nameswapsln1 eosnameswaps accounts
+cleos --url http://jungle2.cryptolions.io:80 get table nameswapsab1 nameswapsab1 accounts

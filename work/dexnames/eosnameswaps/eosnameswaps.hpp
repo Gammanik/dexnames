@@ -45,6 +45,7 @@ struct authority
 
 struct sell_type
 {
+    uint64_t guid;
     name account4sale;
     asset saleprice;
     name paymentaccnt;
@@ -53,7 +54,7 @@ struct sell_type
 
 struct cancel_type
 {
-    name account4sale;
+    uint64_t guid;
     string owner_key_str;
     string active_key_str;
 };
@@ -73,14 +74,14 @@ struct vote_type
 
 struct proposebid_type
 {
-    name account4sale;
+    uint64_t guid;
     asset bidprice;
     name bidder;
 };
 
 struct decidebid_type
 {
-    name account4sale;
+    uint64_t guid;
     bool accept;
 };
 
@@ -150,9 +151,13 @@ class [[eosio::contract]] eosnameswaps : public contract
     const uint16_t BID_ACCEPTED = 2;
 
     // Constructor
-    eosnameswaps(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds), _accounts(_self,_self.value), _extras(_self,_self.value), _bids(_self,_self.value), _stats(_self, _self.value), _referrer(_self, _self.value)  {
-
-    }
+    eosnameswaps(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds),
+    _accounts(_self,_self.value),
+    _sold(_self, _self.value),
+    _extras(_self,_self.value),
+    _bids(_self,_self.value),
+    _stats(_self, _self.value),
+    _referrer(_self, _self.value)  { }
 
     // Buy (transfer) action
     void buy(const transfer_type &transfer_data);
@@ -192,10 +197,10 @@ class [[eosio::contract]] eosnameswaps : public contract
     void initstats();
 
     // Buy an account listed for sale
-    void buy_saleprice(const name account_to_buy, const name from, const asset quantity, const string owner_key, const string active_key, const string referrer);
+    void buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer);
 
     // Buy custom accounts
-    void buy_custom(const name account_name, const name from, const asset quantity, const string owner_key, const string active_key);
+    void buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key);
 
     // Update the auth for account4sale
     void account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey);
@@ -210,11 +215,14 @@ class [[eosio::contract]] eosnameswaps : public contract
     const float referrer_pc = 0.10;
 
     // Fees Accounts
-    name feesaccount = name("nameswapsfee"); //todo: set the desired account at this place
+    name feesaccount = name("dexnamesfees"); //todo: set the desired account at this place
 
     // struct for account table
     struct account_table
     {
+        // The id of the auction
+        uint64_t guid;
+
         // Name of account being sold
         name account4sale;
 
@@ -224,10 +232,41 @@ class [[eosio::contract]] eosnameswaps : public contract
         // Account that payment will be sent to
         name paymentaccnt;
 
-        uint64_t primary_key() const { return account4sale.value; }
+        // Auctions creation datetime
+        uint64_t created_at;
+
+        uint64_t primary_key() const { return guid; }
+//        uint64_t by_datetime() const { return created_at; }
     };
 
     eosio::multi_index<name("accounts"), account_table> _accounts;
+
+
+    struct sold_table {
+      // The id of the auction
+      uint64_t guid;
+
+      // Name of account sold
+      name account4sale;
+
+      // Sale price in EOS
+      asset saleprice;
+
+      // Account that payment is sent to
+      name paymentaccnt;
+
+      // Account who has bought the name
+      name buyer;
+
+      // Timestamp when the contract was sold
+      //todo: decide if it is a uint32_t or uint64_t
+      uint64_t sold_at;
+
+      uint64_t primary_key() const { return guid; }
+    };
+
+    eosio::multi_index<name("sold"), sold_table> _sold;
+
 
     // Struct for extras table
     struct extras_table
@@ -255,6 +294,9 @@ class [[eosio::contract]] eosnameswaps : public contract
     // Struct for bids table
     struct bids_table
     {
+        // The id of the auction bid belongs to
+        uint64_t guid;
+
         // Name of account being sold
         name account4sale;
 
@@ -264,10 +306,13 @@ class [[eosio::contract]] eosnameswaps : public contract
         // The bid price
         asset bidprice;
 
+        // The account selling the name to watch 'my auctions'
+        name paymentaccnt;
+
         // The account making the bid
         name bidder;
 
-        uint64_t primary_key() const { return account4sale.value; }
+        uint64_t primary_key() const { return guid; }
     };
 
     eosio::multi_index<name("bids"), bids_table> _bids;
