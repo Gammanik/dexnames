@@ -112,8 +112,6 @@ setup_contract:
 	# Custom initloan permission
 	$(cleos) set account permission eosnameswaps initloan '{"threshold":1,"keys":[{"key":"$(PUB_KEY_initloan)","weight":1}]'} "active" -p eosnameswaps@active
 
-	# Initloan can call lend function
-	$(cleos) set action permission eosnameswaps eosnameswaps lend initloan
 
 # ---------------------------------------------------------------
 # Setup Wallets

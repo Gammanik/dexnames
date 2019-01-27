@@ -259,7 +259,6 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
     // Update account owner
     // ----------------------------------------------
 
-    // todo: here we are getting the empty active and owner key
     // Remove contract@owner permissions and replace with buyer@active account and the supplied key
     account_auth(itr_accounts->account4sale, from, name("active"), name("owner"), active_key);
 
@@ -686,91 +685,6 @@ void eosnameswaps::account_auth(name account4sale, name changeto, name perm_chil
         .send();
 } // namespace eosio
 
-// Loan CPU/NET to seller
-void eosnameswaps::lend(const lend_type &lend_data)
-{
-
-    // ----------------------------------------------
-    // Auth checks
-    // ----------------------------------------------
-
-    // Only the this permission can init a loan
-    require_auth2(_self.value, name("initloan").value);
-
-    // ----------------------------------------------
-    // Valid transaction checks
-    // ----------------------------------------------
-
-    // Define the delegated bandwidth table
-    typedef eosio::multi_index<name("delband"), delegated_bandwidth> db_table;
-
-    // Get references to the contract loan accounts db tables
-    db_table db_nameswapsln1(name("eosio"), name("nameswapsln1").value);
-    db_table db_nameswapsln2(name("eosio"), name("nameswapsln2").value);
-    db_table db_nameswapsln3(name("eosio"), name("nameswapsln3").value);
-    db_table db_nameswapsln4(name("eosio"), name("nameswapsln4").value);
-
-    // Check the contract hasnt loaned to this account in the last 12 hours
-    eosio_assert(db_nameswapsln1.find(lend_data.account4sale.value) == db_nameswapsln1.end(), "Lend Error: You can only recieve a loan once in 12 hours.");
-    eosio_assert(db_nameswapsln2.find(lend_data.account4sale.value) == db_nameswapsln2.end(), "Lend Error: You can only recieve a loan once in 12 hours.");
-    eosio_assert(db_nameswapsln3.find(lend_data.account4sale.value) == db_nameswapsln3.end(), "Lend Error: You can only recieve a loan once in 12 hours.");
-    eosio_assert(db_nameswapsln4.find(lend_data.account4sale.value) == db_nameswapsln4.end(), "Lend Error: You can only recieve a loan once in 12 hours.");
-
-    // Limit lending to 5/1 EOS for CPU/NET
-    eosio_assert(lend_data.cpu.amount <= 50000 && lend_data.net.amount <= 10000, "Lend Error: Max loan of 5 EOS for CPU and 1 EOS for NET.");
-
-    // ----------------------------------------------
-    // Lend bandwidth to account4sale
-    // ----------------------------------------------
-
-    // Current time in seconds
-    auto timenow = now();
-
-    // Where in four day period?
-    float fourdays = timenow / (3600.0 * 24.0 * 4.0);
-    float frac = fourdays - long(fourdays);
-
-    // Select which loan account to use (rotates every 4 days)
-    name loan_account;
-    if (frac < 0.25)
-    {
-        loan_account = name("nameswapsln1");
-    }
-    else if (frac >= 0.25 && frac < 0.50)
-    {
-        loan_account = name("nameswapsln2");
-    }
-    else if (frac >= 0.50 && frac < 0.75)
-    {
-        loan_account = name("nameswapsln3");
-    }
-    else if (frac > 0.75)
-    {
-        loan_account = name("nameswapsln4");
-    }
-
-    action(
-        permission_level{loan_account, name("loaner")},
-        name("eosio"), name("delegatebw"),
-        std::make_tuple(loan_account, lend_data.account4sale, lend_data.net, lend_data.cpu, false))
-        .send();
-
-    // ----------------------------------------------
-    // Unlend bandwidth (deferred)
-    // ----------------------------------------------
-
-    transaction t{};
-
-    t.actions.emplace_back(
-        permission_level{loan_account, name("loaner")},
-        name("eosio"), name("undelegatebw"),
-        std::make_tuple(loan_account, lend_data.account4sale, lend_data.net, lend_data.cpu));
-
-    // Wait 12hr before unstaking
-    t.delay_sec = 12 * 3600;
-    t.send(now(), _self);
-}
-
 extern "C"
 {
     void apply(uint64_t receiver, uint64_t code, uint64_t action)
@@ -811,10 +725,6 @@ extern "C"
         else if (code == receiver && action == name("screener").value)
         {
             execute_action(name(receiver), name(code), &eosnameswaps::screener);
-        }
-        else if (code == receiver && action == name("lend").value)
-        {
-            execute_action(name(receiver), name(code), &eosnameswaps::lend);
         }
         else if (code == receiver && action == name("regref").value)
         {
