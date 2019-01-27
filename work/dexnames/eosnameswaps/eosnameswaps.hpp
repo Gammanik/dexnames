@@ -125,13 +125,6 @@ struct transfer_type
     string memo;
 };
 
-struct lend_type
-{
-    name account4sale;
-    asset cpu ;
-    asset net;
-};
-
 struct regref_type
 {
     name ref_name;
@@ -186,9 +179,6 @@ class [[eosio::contract]] eosnameswaps : public contract
 
     // Perform screening
     void screener(const screener_type &screener_data);
-
-    // Lend bandwith to acccount4sale
-    void lend(const lend_type &lend_data);
 
     // Register referrer account
     void regref(const regref_type &regref_data);
