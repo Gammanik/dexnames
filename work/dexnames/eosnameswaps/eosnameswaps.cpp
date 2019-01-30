@@ -9,9 +9,7 @@ namespace eosio
 {
 
 // Action: Sell an account
-void eosnameswaps::sell(const sell_type &sell_data)
-{
-
+void eosnameswaps::sell(const sell_type &sell_data) {
     // ----------------------------------------------
     // Auth checks
     // ----------------------------------------------
@@ -19,13 +17,23 @@ void eosnameswaps::sell(const sell_type &sell_data)
     // Only the account4sale@owner can sell (contract@eosio.code must already be an owner)
     require_auth2(sell_data.account4sale.value, name("owner").value);
 
+    // check if someone put a suffix name on sale (this could be implemented more efficient)
+    const string sellName = name{sell_data.account4sale}.to_string();
+    bool has_dot = false;
+
+    if (sellName.length() < 12) {
+      for (int lp = 0; lp <= sellName.length(); ++lp) {
+        if (sellName[lp] == '.') has_dot = true;
+      }
+
+      if (!has_dot) eosio_assert(false, "Are you sure you want to sell suffix account? Contact us: eosnamesbids@gmail.com");
+    }
+
     // ----------------------------------------------
     // Valid transaction checks
     // ----------------------------------------------
 
-    // Check an account with that name is not already listed for sale
-    auto itr_accounts = _accounts.find(sell_data.account4sale.value);
-    eosio_assert(itr_accounts == _accounts.end(), "That account is already for sale.");
+    const uint64_t guid = _accounts.available_primary_key();
 
     // Check the payment account exists
     eosio_assert(is_account(sell_data.paymentaccnt), "Sell Error: The payment account does not exist.");
@@ -57,10 +65,10 @@ void eosnameswaps::sell(const sell_type &sell_data)
     // Place data in accounts table. Seller pays for ram storage
     _accounts.emplace(sell_data.account4sale, [&](auto &s) {
         s.account4sale = sell_data.account4sale;
-        s.guid = sell_data.guid;
+        s.guid = guid;
         s.saleprice = sell_data.saleprice;
         s.paymentaccnt = sell_data.paymentaccnt;
-        s.created_at = now();
+        s.created = now();
     });
 
     // Place data in extras table. Seller pays for ram storage
@@ -74,7 +82,7 @@ void eosnameswaps::sell(const sell_type &sell_data)
 
     // Place data in bids table. Bidder pays for ram storage
     _bids.emplace(sell_data.account4sale, [&](auto &s) {
-        s.guid = sell_data.guid;
+        s.guid = guid;
         s.account4sale = sell_data.account4sale;
         s.bidaccepted = 1;
         s.bidprice = asset(0, symbol("EOS", 4));
@@ -159,11 +167,7 @@ void eosnameswaps::buy(const transfer_type &transfer_data) {
 }
 
 void eosnameswaps::buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key) {
-    //todo: add ".a" suffix instead
     eosio_assert(false, "Suffix sale is not supported yet");
-
-    //todo: transfer back
-    // Transfer the funds back to the suffix 'from' account?
 }
 
 void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer) {
@@ -193,8 +197,7 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
             // Check the bid has been accepted
             if (bid_decision == BID_ACCEPTED)
             {
-                // Check the bid has not been rejected //todo: how long should we wait here? what does rejected mean?
-                                                       //because I don't see any message sending to the seller in here
+                // Check the bid has not been rejected
                 eosio_assert(bid_decision != BID_REJECTED, "Buy Error: The bid has been rejected. Bid higher.");
 
                 // Check the bid has been decided
@@ -289,11 +292,11 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
         s.saleprice = saleprice;
         s.paymentaccnt = itr_accounts->paymentaccnt;
         s.buyer = from;
-        s.sold_at = now(); // todo: debug now: send message with now()?
+        s.sold_at = now(); // TODO TODO:::::::   ::::::::::::: change to sold
     });
 
 
-    // Place data in stats table. Contract pays for ram storage //todo: it's ok
+    // Place data in stats table. Contract pays for ram storage
     auto itr_stats = _stats.find(0);
     _stats.modify(itr_stats, _self, [&](auto &s) {
         s.num_listed--;
@@ -628,7 +631,7 @@ void eosnameswaps::initstats() { //todo: is this not called
 void eosnameswaps::send_message(name receiver, string message) {
 
     action(permission_level{_self, name("active")},
-           name("nameswapsad1"), name("message"), //todo: change to the contract owner's name
+           name(_self), name("message"), //todo: change to the contract owner's name
            std::make_tuple(
                receiver,
                message))

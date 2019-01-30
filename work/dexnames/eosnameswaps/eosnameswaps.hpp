@@ -45,7 +45,6 @@ struct authority
 
 struct sell_type
 {
-    uint64_t guid;
     name account4sale;
     asset saleprice;
     name paymentaccnt;
@@ -208,8 +207,7 @@ class [[eosio::contract]] eosnameswaps : public contract
     name feesaccount = name("dexnamesfees"); //todo: set the desired account at this place
 
     // struct for account table
-    struct account_table
-    {
+    struct account_table {
         // The id of the auction
         uint64_t guid;
 
@@ -223,13 +221,18 @@ class [[eosio::contract]] eosnameswaps : public contract
         name paymentaccnt;
 
         // Auctions creation datetime
-        uint64_t created_at;
+        uint64_t created;
 
         uint64_t primary_key() const { return guid; }
-//        uint64_t by_datetime() const { return created_at; }
+        // making it as a secondary index
+        // to be able to retrieve auction guid when creating a sell
+        uint64_t by_account4sale() const { return account4sale.value; }
     };
 
-    eosio::multi_index<name("accounts"), account_table> _accounts;
+    eosio::multi_index<name("accounts"), account_table,
+      indexed_by<name("account4sale"), const_mem_fun<account_table, uint64_t, &account_table::by_account4sale>>
+    > _accounts;
+
 
 
     struct sold_table {

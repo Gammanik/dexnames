@@ -18,7 +18,7 @@
           "name": "paymentaccnt",
           "type": "name"
         },{
-          "name": "created_at",
+          "name": "created",
           "type": "uint64"
         }
       ]
@@ -120,9 +120,6 @@
       "name": "sell",
       "base": "",
       "fields": [{
-          "name": "guid",
-          "type": "uint64"
-        },{
           "name": "account4sale",
           "type": "name"
         },{
@@ -295,10 +292,12 @@
       "name": "sold",
       "index_type": "i64",
       "key_names": [
-        "primary_key"
+        "primary_key",
+        "by_account4sale",
       ],
       "key_types": [
-        "i64"
+        "i64",
+        "name",
       ],
       "type": "sold_table"
     },{
