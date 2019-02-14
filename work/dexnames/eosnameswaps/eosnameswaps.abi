@@ -83,7 +83,13 @@
         },{
           "name": "bidder",
           "type": "name"
-        }
+        },{
+	      "name": "ownerkey",
+          "type": "string"
+	    },{
+	      "name": "activekey",
+          "type": "string"
+	    }
       ]
     },{
       "name": "stats_table",
@@ -103,17 +109,6 @@
         },{
           "name": "tot_fees",
           "type": "asset"
-        }
-      ]
-    },{
-      "name": "ref_table",
-      "base": "",
-      "fields": [{
-          "name": "ref_name",
-          "type": "name"
-        },{
-          "name": "ref_account",
-          "type": "name"
         }
       ]
     },{
@@ -173,20 +168,6 @@
         }
       ]
     },{
-      "name": "proposebid",
-      "base": "",
-      "fields": [{
-          "name": "guid",
-          "type": "uint64"
-        },{
-          "name": "bidprice",
-          "type": "asset"
-        },{
-          "name": "bidder",
-          "type": "name"
-        }
-      ]
-    },{
       "name": "decidebid",
       "base": "",
       "fields": [{
@@ -220,17 +201,6 @@
         }
       ]
     },{
-      "name": "regref",
-      "base": "",
-      "fields": [{
-          "name": "reg_name",
-          "type": "name"
-        },{
-          "name": "reg_account",
-          "type": "name"
-        }
-      ]
-    },{
       "name": "initstats",
       "base": "",
       "fields": []
@@ -253,10 +223,6 @@
       "type": "vote",
       "ricardian_contract": ""
     },{
-      "name": "proposebid",
-      "type": "proposebid",
-      "ricardian_contract": ""
-    },{
       "name": "decidebid",
       "type": "decidebid",
       "ricardian_contract": ""
@@ -267,10 +233,6 @@
     },{
       "name": "screener",
       "type": "screener",
-      "ricardian_contract": ""
-    },{
-      "name": "regref",
-      "type": "regref",
       "ricardian_contract": ""
     },{
       "name": "initstats",
@@ -330,16 +292,6 @@
         "i64"
       ],
       "type": "stats_table"
-    },{
-      "name": "referrer",
-      "index_type": "i64",
-      "key_names": [
-        "name"
-      ],
-      "key_types": [
-        "name"
-      ],
-      "type": "ref_table"
     }
   ],
   "ricardian_clauses": [],
