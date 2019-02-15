@@ -269,7 +269,6 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
 
     // Check an account with that name is listed for sale
     auto itr_accounts = _accounts.find(cancel_data.guid);
-
     eosio_assert(itr_accounts != _accounts.end(), "Cancel Error: That account name is not listed for sale");
 
     // Only the payment account can cancel the sale (the contract has the owner key)
@@ -285,6 +284,18 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     // Change auth from contract@owner to submitted owner key
     account_auth(itr_accounts->account4sale, itr_accounts->paymentaccnt, name("owner"), name(""), cancel_data.owner_key_str);
 
+    auto itr_bids = _bids.find(cancel_data.guid);
+    if (itr_bids->bidprice != asset(0, symbol("EOS", 4))) { // todo: will it work? maybe check for null?
+		// Transfer EOS back to the bidder
+        action(
+            permission_level{_self, name("active")},
+            name("eosio.token"), name("transfer"),
+            std::make_tuple(_self, itr_bids->paymentaccnt, itr_bids->bidprice, std::string("EOSNameSwaps: The auction name:") + itr_accounts->account4sale.to_string() + std::string("was cancelled by seller. Refunding your bid.")))
+            .send();
+    }
+
+	// todo: add charging fee for the cancel?
+
     // ----------------------------------------------
     // Cleanup
     // ----------------------------------------------
@@ -297,7 +308,6 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
     _extras.erase(itr_extras);
 
     // Erase account from the bids table
-    auto itr_bids = _bids.find(cancel_data.guid);
     _bids.erase(itr_bids);
 
     // Place data in stats table. Contract pays for ram storage
@@ -404,6 +414,16 @@ void eosnameswaps::bid(const uint64_t auction_guid, const name bidder, const ass
 
     // Only accept new bids if they are lower than the sale price
     eosio_assert(bidprice <= itr_accounts->saleprice, "Propose Bid Error: You must bid lower than the sale price.");
+
+
+    if (itr_bids->bidprice != asset(0, symbol("EOS", 4))) { // todo: will it work? maybe check for null?
+        // Transfer EOS back to the bidder
+        action(
+            permission_level{_self, name("active")},
+            name("eosio.token"), name("transfer"),
+            std::make_tuple(_self, itr_bids->paymentaccnt, itr_bids->bidprice, std::string("EOSNameSwaps: auction: ") + itr_accounts->account4sale.to_string() + std::string(". you were re-bided. Refunding your bid.")))
+            .send();
+    }
 
     // ----------------------------------------------
     // Update table
