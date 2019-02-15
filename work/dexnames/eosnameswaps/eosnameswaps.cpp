@@ -118,7 +118,7 @@ void eosnameswaps::handle_transfer(const transfer_type &transfer_data) {
 
     // Check the buy code is valid
     const string buy_code = transfer_data.memo.substr(0, 3);
-    // todo: buy_code == "" in case of sending money on conract myself
+	// buy_code == "fii" in case if you want to send money on the conract then just write "fill" in memo
     eosio_assert(buy_code == "cn:" || buy_code == "sp:" || buy_code == "bd:" || buy_code == "fil", "Buy Error: Malformed buy string.");
 
     if (buy_code == "fil") {
@@ -187,7 +187,7 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
     // ----------------------------------------------
     // Seller, Contract, & Referrer fees
     // ----------------------------------------------
-
+	// todo dlfkd /////////////////////////////////////////////////////////// ------------------------==--==========================
     auto sellerfee = asset(0, symbol("EOS", 4));
     auto contractfee = asset(0, symbol("EOS", 4));
 
@@ -444,7 +444,67 @@ void eosnameswaps::bid(const uint64_t auction_guid, const name bidder, const ass
         string(" has received a bid. If you choose to accept it, you'll get the XX EOS. Others can still bid higher or pay the full sale price until then."));
 }
 
-// Action: Accept or decline a bid for an account
+void eosnameswaps::cancelbid(const cancelbid_type &cancelbid_data) {
+	    // ----------------------------------------------
+        // Auth checks
+        // ----------------------------------------------
+
+        // Check an account with that name is listed for sale
+        auto itr_accounts = _accounts.find(cancelbid_data.guid);
+        eosio_assert(itr_accounts != _accounts.end(), "Cancel Bid Error: That account name is not listed for sale.");
+
+        // Only the bidder account can cancel bids
+        auto itr_bids = _bids.find(cancelbid_data.guid);
+        eosio_assert(itr_bids->bidprice > asset(0, symbol("EOS", 4)), "Cancel Bid Error: The auction does not have any bids.");
+        eosio_assert(has_auth(itr_bids->bidder), "Cancel Bid Error: Only the bidder account can cancel bids.");
+
+	    // ----------------------------------------------
+        // Seller, Contract, & Referrer fees
+        // ----------------------------------------------
+
+        // Refund the bid to the bidder
+	    auto bidderfee = asset(0, symbol("EOS", 4));
+        auto cancelbidfee = asset(0, symbol("EOS", 4));
+
+        // Fee amounts
+        cancelbidfee.amount = int(itr_bids->bidprice.amount * cancelbid_pc);
+        bidderfee.amount = itr_bids->bidprice.amount - cancelbidfee.amount;
+
+        // Transfer EOS from contract to contract fees account
+        action(
+            permission_level{_self, name("active")},
+            name("eosio.token"), name("transfer"),
+            std::make_tuple(_self, feesaccount, cancelbidfee,
+                std::string("EOSNameSwaps: Cancel bid fee by: ") + itr_bids->bidder.to_string() +
+                std::string(". For the account: ") + itr_accounts->account4sale.to_string()))
+            .send();
+
+        // Transfer EOS from contract to seller minus the contract fees
+        action(
+            permission_level{_self, name("active")},
+            name("eosio.token"), name("transfer"),
+            std::make_tuple(_self, itr_accounts->paymentaccnt, bidderfee, // todo: to whom should I send it: paymentaccnt or itr_accounts->account4sale?
+                std::string("EOSNameSwaps: Bid refund fee for the auction: ") + itr_accounts->account4sale.to_string()))
+            .send();
+
+
+        // ----------------------------------------------
+        // Update table
+        // ----------------------------------------------
+
+        // Place data in bids table. Bidder pays for ram storage
+        _bids.modify(itr_bids, _self, [&](auto &s) { // todo: make the person cancelling the bid to pay for the ram?
+            s.bidaccepted = 1; // todo: this field now is useless
+            s.bidprice = asset(0, symbol("EOS", 4));
+            s.bidder = name("");
+            s.ownerkey = "";
+            s.activekey = "";
+        });
+
+
+}
+
+// Action: Accept or decline a bid for an account. paymentaccnt has to decide
 void eosnameswaps::decidebid(const decidebid_type &decidebid_data) {
 
     // ----------------------------------------------
@@ -704,6 +764,10 @@ extern "C"
         {
             execute_action(name(receiver), name(code), &eosnameswaps::initstats);
         }
+        else if (code == receiver && action == name("cancelbid").value)
+	    {
+	        execute_action(name(receiver), name(code), &eosnameswaps::cancelbid);
+	    }
         eosio_exit(0);
     }
 }

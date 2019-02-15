@@ -142,6 +142,13 @@
           "type": "string"
         }
       ]
+    }{
+     "name": "cancelbid",
+     "base": "",
+     "fields": [{
+        "name": "guid",
+        "type": "uint64"
+     }]
     },{
       "name": "updatesale",
       "base": "",
@@ -213,6 +220,10 @@
     },{
       "name": "cancel",
       "type": "cancel",
+      "ricardian_contract": ""
+    },{
+      "name": "cancelbid",
+      "type": "cancelbid",
       "ricardian_contract": ""
     },{
       "name": "updatesale",

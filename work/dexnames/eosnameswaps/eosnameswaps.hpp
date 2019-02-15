@@ -58,6 +58,10 @@ struct cancel_type
     string active_key_str;
 };
 
+struct cancelbid_type {
+	uint64_t guid;
+};
+
 struct updatesale_type
 {
     name account4sale;
@@ -156,6 +160,8 @@ class [[eosio::contract]] eosnameswaps : public contract
     // Propose a bid
     void bid(const uint64_t auction_guid, const name bidder,  const asset bidprice, const string owner_key, const string active_key);
 
+    void cancelbid(const cancelbid_type &cancelbid_data);
+
     // Decide on a bid
     void decidebid(const decidebid_type &decidebid_data);
 
@@ -184,6 +190,8 @@ class [[eosio::contract]] eosnameswaps : public contract
 
     // Contract & Referrer fee %
     const float contract_pc = 0.02;
+    // Percent for the cancelling the bid
+    const float cancelbid_pc = 0.01; // todo: make a fix price instead? - what if the bid is big
 
     // Fees Accounts
     name feesaccount = name("dexnamesfees"); //todo: set the desired account at this place
