@@ -119,9 +119,9 @@ void eosnameswaps::handle_transfer(const transfer_type &transfer_data) {
     // Check the buy code is valid
     const string buy_code = transfer_data.memo.substr(0, 3);
 	// buy_code == "fii" in case if you want to send money on the conract then just write "fill" in memo
-    eosio_assert(buy_code == "cn:" || buy_code == "sp:" || buy_code == "bd:" || buy_code == "fil", "Buy Error: Malformed buy string.");
+    eosio_assert(buy_code == "cn:" || buy_code == "sp:" || buy_code == "bd:" || buy_code == "", "Buy Error:: Malformed buy string:");
 
-    if (buy_code == "fil") {
+    if (buy_code == "") {
         return;
     }
 
@@ -187,7 +187,7 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
     // ----------------------------------------------
     // Seller, Contract, & Referrer fees
     // ----------------------------------------------
-	// todo dlfkd /////////////////////////////////////////////////////////// ------------------------==--==========================
+
     auto sellerfee = asset(0, symbol("EOS", 4));
     auto contractfee = asset(0, symbol("EOS", 4));
 
@@ -483,7 +483,7 @@ void eosnameswaps::cancelbid(const cancelbid_type &cancelbid_data) {
         action(
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, itr_accounts->paymentaccnt, bidderfee, // todo: to whom should I send it: paymentaccnt or itr_accounts->account4sale?
+            std::make_tuple(_self, itr_bids->bidder, bidderfee,
                 std::string("EOSNameSwaps: Bid refund fee for the auction: ") + itr_accounts->account4sale.to_string()))
             .send();
 
@@ -534,7 +534,7 @@ void eosnameswaps::decidebid(const decidebid_type &decidebid_data) {
     // Place data in bids table. Bidder pays for ram storage
     if (decidebid_data.accept == true)
     {
-        auto saleprice = itr_accounts->saleprice;
+        auto saleprice = itr_bids->bidprice;
         auto sellerfee = asset(0, symbol("EOS", 4));
         auto contractfee = asset(0, symbol("EOS", 4));
 
@@ -722,6 +722,18 @@ void eosnameswaps::account_auth(name account4sale, name changeto, name perm_chil
                contract_authority))
         .send();
 } // namespace eosio
+
+
+//void eosnameswaps::erasetables() {
+//	// Only the contract account can init the stats table
+//    require_auth(_self);
+
+//	auto itr_bids = _bids->begin();
+//    while (itr_bids != table->end()) {
+//        itr_bids = table->erase(itr_bids);
+//    }
+
+//}
 
 extern "C"
 {
