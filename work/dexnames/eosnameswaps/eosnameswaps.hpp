@@ -71,13 +71,6 @@ struct vote_type
     name voter;
 };
 
-struct proposebid_type
-{
-    uint64_t guid;
-    asset bidprice;
-    name bidder;
-};
-
 struct decidebid_type
 {
     uint64_t guid;
@@ -124,12 +117,6 @@ struct transfer_type
     string memo;
 };
 
-struct regref_type
-{
-    name ref_name;
-    name ref_account;
-};
-
 class [[eosio::contract]] eosnameswaps : public contract
 {
 
@@ -148,11 +135,10 @@ class [[eosio::contract]] eosnameswaps : public contract
     _sold(_self, _self.value),
     _extras(_self,_self.value),
     _bids(_self,_self.value),
-    _stats(_self, _self.value),
-    _referrer(_self, _self.value)  { }
+    _stats(_self, _self.value)  { }
 
-    // Buy (transfer) action
-    void buy(const transfer_type &transfer_data);
+    // Buy or bid action
+    void handle_transfer(const transfer_type &transfer_data);
 
     // Sell account action
     void sell(const sell_type &sell_data);
@@ -168,7 +154,7 @@ class [[eosio::contract]] eosnameswaps : public contract
     void vote(const vote_type &vote_data);
 
     // Propose a bid
-    void proposebid(const proposebid_type &proposebid_data);
+    void bid(const uint64_t auction_guid, const name bidder,  const asset bidprice, const string owner_key, const string active_key);
 
     // Decide on a bid
     void decidebid(const decidebid_type &decidebid_data);
@@ -179,14 +165,11 @@ class [[eosio::contract]] eosnameswaps : public contract
     // Perform screening
     void screener(const screener_type &screener_data);
 
-    // Register referrer account
-    void regref(const regref_type &regref_data);
-
     // Init the stats table
     void initstats();
 
     // Buy an account listed for sale
-    void buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key, const string referrer);
+    void buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key);
 
     // Buy custom accounts
     void buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key);
@@ -201,7 +184,6 @@ class [[eosio::contract]] eosnameswaps : public contract
 
     // Contract & Referrer fee %
     const float contract_pc = 0.02;
-    const float referrer_pc = 0.10;
 
     // Fees Accounts
     name feesaccount = name("dexnamesfees"); //todo: set the desired account at this place
@@ -305,6 +287,10 @@ class [[eosio::contract]] eosnameswaps : public contract
         // The account making the bid
         name bidder;
 
+        // In case bid is accepted it's getting the new active & owner keys
+        string ownerkey;
+        string activekey;
+
         uint64_t primary_key() const { return guid; }
     };
 
@@ -333,21 +319,6 @@ class [[eosio::contract]] eosnameswaps : public contract
     };
 
     eosio::multi_index<name("stats"), stats_table> _stats;
-
-    // Struct for the referrer table
-    struct ref_table
-    {
-
-        // Referrer's name
-        name ref_name;
-
-        // Referrer's fee account
-        name ref_account;
-
-        uint64_t primary_key() const { return ref_name.value; }
-    };
-
-    eosio::multi_index<name("referrer"), ref_table> _referrer;
 };
 
 } // namespace eosio
