@@ -290,8 +290,11 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
         action(
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, itr_bids->paymentaccnt, itr_bids->bidprice, std::string("EOSNameSwaps: The auction name:") + itr_accounts->account4sale.to_string() + std::string("was cancelled by seller. Refunding your bid.")))
-            .send();
+            std::make_tuple(_self, itr_bids->bidder, itr_bids->bidprice,
+            std::string("EOSNameSwaps: The auction name:") +
+            itr_accounts->account4sale.to_string() +
+            std::string(" was cancelled by seller. Refunding your bid.")))
+        .send();
     }
 
 	// todo: add charging fee for the cancel?
