@@ -1,0 +1,54 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 22 15:55:37 2019",
+    "version": "eosio::abi/1.1",
+    "structs": [
+        {
+            "name": "regname",
+            "base": "",
+            "fields": [
+                {
+                    "name": "newname",
+                    "type": "name"
+                },
+                {
+                    "name": "ownerkey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "activekey",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "regname_type",
+            "base": "",
+            "fields": [
+                {
+                    "name": "newname",
+                    "type": "name"
+                },
+                {
+                    "name": "ownerkey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "activekey",
+                    "type": "public_key"
+                }
+            ]
+        }
+    ],
+    "types": [],
+    "actions": [
+        {
+            "name": "regname",
+            "type": "regname",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "abi_extensions": []
+}

@@ -12,8 +12,7 @@
 #include "includes/abieos_numeric.hpp"
 //#include <eosiolib/action.hpp>
 
-namespace eosiosystem
-{
+namespace eosiosystem {
 class system_contract;
 }
 
