@@ -21,26 +21,17 @@ void premium::regname(const regname_type &regname_data) {
   
   
   const std::string suffix_name = "sex";
-
-//  action(permission_level{name(suffix_name), name("active")},
-//         name("eosio"), name("newaccount"),
-//         std::make_tuple(
-//                 name("sex"),
-//                 name("12341"),
-//                 owner_auth,
-//                 active_auth
-//         )).send();
   
-  const string accountToCreate = "nameswapsaab"; // todo: add suffix here?
+  const string accountToCreate = "nameswap.sex"; // todo: add suffix here?
   
-  action(permission_level{name(_self), name("active")},
-         name("eosio"), name("newaccount"),
-         std::make_tuple(
-             name(_self),
-             name(accountToCreate),
-             active_auth,
-             active_auth
-         )).send();
+  action(permission_level{name(suffix_name), name("active")},
+       name("eosio"), name("newaccount"),
+       std::make_tuple(
+               name("sex"),
+               name(accountToCreate),
+               active_auth,
+               active_auth
+       )).send();
 
   const auto ramAmount = asset(500, symbol("EOS", 4)); // todo: out it in the config/singleton
   const auto cpu = asset(1500, symbol("EOS", 4));
@@ -65,13 +56,66 @@ void premium::regname(const regname_type &regname_data) {
   
   
 }
+  
+void premium::handle_transfer(name from, name to, asset quantity, string memo) {
+  // Important: The transfer fees actions below will trigger this function without this
+  if (from == _self) return;
+  // EOSBet hack
+  eosio_assert(to == _self, "Buy Error: Transfer must be direct to contract.");
+  // todo: add assert for quantity
+  
+  const int codeLen = 4;
+  const string transfer_code = memo.substr(0, codeLen);
+  // buy_code == "fii" in case if you want to send money on the conract then just write nothing in memo
+  eosio_assert(transfer_code == "ask:" || transfer_code == "", ("Ask error: Malformed ask code: " + transfer_code).c_str());
+  
+  if (transfer_code == "") {
+    return;
+  }
+  
+  // Strip buy code from memo
+  memo = memo.substr(codeLen);
+  
+  
+  if (transfer_code == "ask:") {
+//    const string owner_key = memo.substr(0, KEY_LENGTH);
+//    const string active_key = memo.substr(KEY_LENGTH + 1, 2*KEY_LENGTH + 1);
+    
+    const name nameasked = name(memo.substr(0, memo.length()));
+    askprice(from, nameasked);
+  } else if (transfer_code == "buy:") {
+  
+  }
+}
+
+void premium::askprice(name account, name nameasked) {
+  // check the rules
+  
+  
+  
+}
+
+void premium::buyname(uuid id) {
+  // check the rules
+  
+  
+}
+
+
+//void premium::
+
+
 
 
 extern "C"
 {
 void apply(uint64_t receiver, uint64_t code, uint64_t action) {
   
-  if (code == receiver && action == name("regname").value) {
+  if (code == name("eosio.token").value && action == name("transfer").value) {
+    execute_action(name(receiver), name(code), &premium::handle_transfer);
+  } else if (code == receiver && action == name("regname").value) {
+    execute_action(name(receiver), name(code), &premium::regname);
+  } else if (code == receiver && action == name("regname").value) {
     execute_action(name(receiver), name(code), &premium::regname);
   }
 }
