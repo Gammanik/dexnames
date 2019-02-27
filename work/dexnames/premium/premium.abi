@@ -1,53 +1,138 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 22 15:55:37 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Feb 27 19:49:02 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
-            "name": "regname",
+            "name": "Config",
             "base": "",
             "fields": [
                 {
-                    "name": "newname",
-                    "type": "name"
+                    "name": "last_id",
+                    "type": "uuid"
                 },
                 {
-                    "name": "ownerkey",
-                    "type": "public_key"
-                },
-                {
-                    "name": "activekey",
-                    "type": "public_key"
+                    "name": "askdeposit",
+                    "type": "asset"
                 }
             ]
         },
         {
-            "name": "regname_type",
+            "name": "askprice",
             "base": "",
             "fields": [
                 {
-                    "name": "newname",
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "ownerkey",
-                    "type": "public_key"
+                    "name": "nametobuy",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "asks_table",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
                 },
                 {
-                    "name": "activekey",
-                    "type": "public_key"
+                    "name": "nametobuy",
+                    "type": "name"
+                },
+                {
+                    "name": "requester",
+                    "type": "name"
+                },
+                {
+                    "name": "asktime",
+                    "type": "unix_time"
+                }
+            ]
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "responses_table",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "nametobuy",
+                    "type": "name"
+                },
+                {
+                    "name": "requester",
+                    "type": "name"
+                },
+                {
+                    "name": "asktime",
+                    "type": "unix_time"
+                },
+                {
+                    "name": "price",
+                    "type": "asset"
+                },
+                {
+                    "name": "respondtime",
+                    "type": "unix_time"
                 }
             ]
         }
     ],
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "unix_time",
+            "type": "uint32"
+        },
+        {
+            "new_type_name": "uuid",
+            "type": "uint64"
+        }
+    ],
     "actions": [
         {
-            "name": "regname",
-            "type": "regname",
+            "name": "askprice",
+            "type": "askprice",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "init",
+            "type": "init",
             "ricardian_contract": ""
         }
     ],
-    "tables": [],
+    "tables": [
+        {
+            "name": "asks",
+            "type": "asks_table",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "responses",
+            "type": "responses_table",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "settings",
+            "type": "Config",
+            "index_type": "i64",
+            "key_names": [ "id" ],
+            "key_types": [ "i64" ]
+        }
+    ],
     "ricardian_clauses": [],
     "variants": [],
     "abi_extensions": []

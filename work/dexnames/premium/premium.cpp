@@ -88,21 +88,49 @@ void premium::handle_transfer(name from, name to, asset quantity, string memo) {
   }
 }
 
-void premium::askprice(name account, name nameasked) {
+void premium::askprice(const name requester, const name nametobuy) {
   // check the rules
   
+  // increment the uuid of the ask
+  Config state = _get_config();
+  state.last_id = state.last_id++; // todo: not updating the id
+  _update_config(state);
   
+//  _asks.emplace(requester, [&](asks_table &a) {
+//    a.id = state.last_id;
+//    a.nametobuy = nametobuy;
+//    a.requester = requester;
+//    a.asktime = now();
+//  });
+  
+  // todo: add deferred action in 3 days call expired ask
   
 }
 
-void premium::buyname(uuid id) {
-  // check the rules
+void premium::init() {
+//  require_auth(_self);
+  const uuid last_id = 1;
   
-  
+//  ConfigSingleton(_self, _self).set(last_id, asset(2, symbol("EOS", 4)));
+  ConfigSingleton.set(Config{last_id, asset(2, symbol("EOS", 4))}, _self);
 }
 
+premium::Config premium::_get_config() {
+  premium::Config config;
+  
+  if (ConfigSingleton.exists()) {
+    config = ConfigSingleton.get();
+  } else {
+    config = Config{};
+    ConfigSingleton.set(config, _self);
+  }
+  
+  return config;
+}
 
-//void premium::
+void premium::_update_config(const premium::Config config) {
+  ConfigSingleton.set(config, _self);
+}
 
 
 
@@ -113,8 +141,6 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
   
   if (code == name("eosio.token").value && action == name("transfer").value) {
     execute_action(name(receiver), name(code), &premium::handle_transfer);
-  } else if (code == receiver && action == name("regname").value) {
-    execute_action(name(receiver), name(code), &premium::regname);
   } else if (code == receiver && action == name("regname").value) {
     execute_action(name(receiver), name(code), &premium::regname);
   }
