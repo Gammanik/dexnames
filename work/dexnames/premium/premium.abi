@@ -130,7 +130,7 @@
             "type": "Config",
             "index_type": "i64",
             "key_names": [ "id" ],
-            "key_types": [ "i64" ]
+            "key_types": [ "uuid" ]
         }
     ],
     "ricardian_clauses": [],

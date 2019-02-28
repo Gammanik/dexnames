@@ -93,7 +93,7 @@ void premium::askprice(const name requester, const name nametobuy) {
   
   // increment the uuid of the ask
   Config state = _get_config();
-  state.last_id = state.last_id++; // todo: not updating the id
+  state.last_id = state.last_id + 1;
   _update_config(state);
   
 //  _asks.emplace(requester, [&](asks_table &a) {
@@ -106,6 +106,8 @@ void premium::askprice(const name requester, const name nametobuy) {
   // todo: add deferred action in 3 days call expired ask
   
 }
+
+//void premium::_next_id()
 
 void premium::init() {
 //  require_auth(_self);
