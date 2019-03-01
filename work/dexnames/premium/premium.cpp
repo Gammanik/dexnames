@@ -90,32 +90,121 @@ void premium::handle_transfer(name from, name to, asset quantity, string memo) {
 
 void premium::askprice(const name requester, const name nametobuy) {
   // check the rules
+  eosio_assert(has_auth(requester), "Ask price Error: You're not who you say you are.");
   
   // increment the uuid of the ask
-  Config state = _get_config();
-  state.last_id = state.last_id + 1;
-  _update_config(state);
   
-//  _asks.emplace(requester, [&](asks_table &a) {
-//    a.id = state.last_id;
-//    a.nametobuy = nametobuy;
-//    a.requester = requester;
-//    a.asktime = now();
-//  });
+  uuid new_id = _next_id();
+  
+  // Cannot charge RAM to other accounts during notify
+  _asks.emplace(_self, [&](asks_table &a) {
+    a.id = new_id;
+    a.nametobuy = nametobuy;
+    a.requester = requester;
+    a.asktime = now();
+  });
   
   // todo: add deferred action in 3 days call expired ask
   
-}
-
-//void premium::_next_id()
-
-void premium::init() {
-//  require_auth(_self);
-  const uuid last_id = 1;
   
-//  ConfigSingleton(_self, _self).set(last_id, asset(2, symbol("EOS", 4)));
-  ConfigSingleton.set(Config{last_id, asset(2, symbol("EOS", 4))}, _self);
 }
+
+
+void premium::approveask(uuid id, asset price, name admin) {
+  eosio_assert(has_auth(admin), "Ask price Error: You're not who you say you are.");
+  // todo: add check if an admin from the table
+  // _admins.find(admin) & assert
+
+  auto itr_ask = _asks.find(id);
+  eosio_assert(itr_ask != _asks.end(), ("Approve ask error: ask with a given id does not exists. id: " + std::to_string(id)).c_str());
+  
+  _responses.emplace(admin, [&](responses_table &a) {
+    a.id = id;
+    a.status = ASK_ACCEPTED;
+    a.nametobuy = itr_ask->nametobuy;
+    a.requester = itr_ask->requester;
+    a.asktime = a.asktime;
+    a.respondtime = a.respondtime;
+    a.price = price;
+  });
+
+  _asks.erase(itr_ask);
+  
+  // todo: send a message to a itr_ask.requester that his ask was approved
+  send_message(itr_ask->requester, "Nameos: your ask was approved. You have 3 days to buy the name");
+  
+  
+  // todo: check if 3 days yet not expired (just in case)
+}
+
+void premium::declineask(uuid id, name admin) {
+  eosio_assert(has_auth(admin), "Ask price Error: You're not who you say you are.");
+  
+  auto itr_ask = _asks.find(id);
+  eosio_assert(itr_ask != _asks.end(), ("Approve ask error: ask with a given id does not exists. id: " + std::to_string(id)).c_str());
+  
+  _responses.emplace(admin, [&](responses_table &a) {
+    a.id = id;
+    a.status = ASK_DECLINED;
+    a.nametobuy = itr_ask->nametobuy;
+    a.requester = itr_ask->requester;
+    a.asktime = a.asktime;
+    a.respondtime = a.respondtime;
+    a.price = asset(-1, symbol("EOS", 4));
+  });
+  
+  _asks.erase(itr_ask);
+  
+  
+  send_message(itr_ask->requester, "Nameos: your ask was declined. Sorry.");
+  // todo: send the pledge back
+  
+}
+
+void premium::buyname(uuid id, asset price, string active_key, string owner_key) {
+  eosio_assert(false, "ths on is ok todo");
+  auto itr_resp = _responses.find(id);
+  eosio_assert(itr_resp != _responses.end(), string("Buy name error: no response for a given ask id. id: " + std::to_string(id)).c_str());
+  
+  // check if
+}
+
+
+
+// Message Action
+void premium::send_message(const name receiver, const string message) {
+  action(permission_level{_self, name("active")},
+         name(_self), name("message"),
+         std::make_tuple(
+                 receiver,
+                 message))
+          .send();
+}
+
+void premium::message(const name receiver, const string message) {
+  // Only the contract can send a message
+  eosio_assert(has_auth(_self), "Message Error: Only the contract can send messages.");
+  // Notify the specified account
+  require_recipient(receiver);
+}
+
+//void premium::init() {
+////  require_auth(_self);
+//  ConfigSingleton.set(Config{}, _self);
+//}
+
+/* ****************************************** */
+/* ------------ Private Functions ----------- */
+/* ****************************************** */
+
+uuid premium::_next_id() {
+  Config state = _get_config();
+  state.last_id = state.last_id + 1;
+  eosio_assert(state.last_id > 0, "_next_id overflow detected");
+  _update_config(state);
+  
+  return state.last_id;
+};
 
 premium::Config premium::_get_config() {
   premium::Config config;
@@ -145,7 +234,16 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
     execute_action(name(receiver), name(code), &premium::handle_transfer);
   } else if (code == receiver && action == name("regname").value) {
     execute_action(name(receiver), name(code), &premium::regname);
+    
+  } else if (code == receiver && action == name("approveask").value) {
+    execute_action(name(receiver), name(code), &premium::approveask);
+  } else if (code == receiver && action == name("declineask").value) {
+    execute_action(name(receiver), name(code), &premium::declineask);
+    
+  } else if (code == receiver && action == name("askprice").value) {
+    execute_action(name(receiver), name(code), &premium::askprice);
   }
+
 }
 
 

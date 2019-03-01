@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Feb 27 19:49:02 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Mar  1 16:59:04 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -13,6 +13,24 @@
                 {
                     "name": "askdeposit",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "approveask",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "price",
+                    "type": "asset"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
                 }
             ]
         },
@@ -53,9 +71,37 @@
             ]
         },
         {
+            "name": "declineask",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "init",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "message",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receiver",
+                    "type": "name"
+                },
+                {
+                    "name": "message",
+                    "type": "string"
+                }
+            ]
         },
         {
             "name": "responses_table",
@@ -78,12 +124,16 @@
                     "type": "unix_time"
                 },
                 {
+                    "name": "respondtime",
+                    "type": "unix_time"
+                },
+                {
                     "name": "price",
                     "type": "asset"
                 },
                 {
-                    "name": "respondtime",
-                    "type": "unix_time"
+                    "name": "status",
+                    "type": "uint8"
                 }
             ]
         }
@@ -100,14 +150,33 @@
     ],
     "actions": [
         {
+            "name": "approveask",
+            "type": "approveask",
+            "ricardian_contract": ""
+        },
+        {
             "name": "askprice",
             "type": "askprice",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "declineask",
+            "type": "declineask",
             "ricardian_contract": ""
         },
         {
             "name": "init",
             "type": "init",
             "ricardian_contract": ""
+        },
+        {
+            "name": "message",
+            "type": "message",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "buyname",
+            "type":
         }
     ],
     "tables": [
@@ -115,15 +184,15 @@
             "name": "asks",
             "type": "asks_table",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": [ "id" ],
+            "key_types": [ "uuid" ]
         },
         {
             "name": "responses",
             "type": "responses_table",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": []
+            "key_names": [ "id" ],
+            "key_types": [ "uuid" ]
         },
         {
             "name": "settings",

@@ -37,6 +37,12 @@ namespace eosio {
   
   class [[eosio::contract]] premium : public contract {
   public:
+  
+    // ask decision responses
+    const uint8_t ASK_ACCEPTED = 0;
+    const uint8_t ASK_DECLINED = 1;
+    const uint8_t ASK_EXPIRED = 2;
+  
     const uint16_t KEY_LENGTH = 53;
     
     // Constructor
@@ -57,10 +63,11 @@ namespace eosio {
     [[eosio::action]]
     void init();
     
-//    [[eosio::action]]
-//    void approveask(uuid id, asset price);
-//    [[eosio::action]] // admin declined
-//    void declineask(uuid id);
+    // approve ask with a given id and set a price to
+    [[eosio::action]]
+    void approveask(uuid id, asset price, name admin);
+    [[eosio::action]] // admin declined
+    void declineask(uuid id, name admin);
 //    [[eosio::action]] // if an ask has expired (3 days has gone)
 //    void expireask(uuid id);
 //
@@ -71,8 +78,8 @@ namespace eosio {
 //    void deleteadmin(name admin);
     
     
-//    // user decided to buy the name for a given price
-//    void buyname(uuid id);
+    // user decided to buy the name for a given price
+    void buyname(uuid id, asset price, string active_key, string owner_key);
 //    // user decided to decline the name for a given price
 //    void declinename(uuid id);
 
@@ -88,8 +95,11 @@ namespace eosio {
     // accessors
     premium::Config _get_config();
     void _update_config(const premium::Config config);
+    uuid _next_id();
     
-  
+    void send_message(const name receiver, const string message);
+    [[eosio::action]]
+    void message(const name receiver, const string message);
     
     struct [[eosio::table]] asks_table {
       uuid id; // index
@@ -100,7 +110,7 @@ namespace eosio {
       // the time the request is created at (to count 3 days from it)
       unix_time asktime;
   
-      uint64_t primary_key() const { return id; } // todo: make uint32_t if not working
+      uint64_t primary_key() const { return id; }
     };
     eosio::multi_index<name("asks"), asks_table> _asks;
   
@@ -111,15 +121,14 @@ namespace eosio {
       name nametobuy;
       // the account applied to buy a name
       name requester;
-      // the time the request is created at (to count 3 days from it)
+      // the time the request was created
       unix_time asktime;
-      // asked price for a premium name
-      asset price;
       // the time the administrator responded
       unix_time respondtime;
-      // check whether the user is allowed to buy the requested name
-      // bool isallowed
-      // todo: make state: result: expired | approved | rejected
+      // asked price for a premium name
+      asset price;
+      
+      uint8_t status; // expired | approved | rejected
       
       uint64_t primary_key() const { return id; }
     };
