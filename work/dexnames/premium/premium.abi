@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Mar  1 16:59:04 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Mar  2 17:34:25 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -85,6 +85,11 @@
             ]
         },
         {
+            "name": "deleteconfig",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "init",
             "base": "",
             "fields": []
@@ -165,6 +170,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "deleteconfig",
+            "type": "deleteconfig",
+            "ricardian_contract": ""
+        },
+        {
             "name": "init",
             "type": "init",
             "ricardian_contract": ""
@@ -173,10 +183,6 @@
             "name": "message",
             "type": "message",
             "ricardian_contract": ""
-        },
-        {
-            "name": "buyname",
-            "type":
         }
     ],
     "tables": [

@@ -29,11 +29,11 @@ namespace eosio {
   typedef uint64_t uuid;
   typedef uint32_t unix_time;
   
-  struct regname_type { // todo: DELETE THE SHIT
-      name newname;
-      eosio::public_key ownerkey;
-      eosio::public_key activekey;
-  };
+//  struct regname_type { // todo: DELETE THE SHIT
+//      name newname;
+//      eosio::public_key ownerkey;
+//      eosio::public_key activekey;
+//  };
   
   class [[eosio::contract]] premium : public contract {
   public:
@@ -53,7 +53,7 @@ namespace eosio {
     { }
       
 //    [[eosio::action]]
-    void regname(const regname_type &regname_data);
+    void regname(const name newname, const string owner_key_string, const string active_key_string);
     
     void handle_transfer(const name from, const name to, const asset quantity, const string memo);
     // user is asking for a price
@@ -82,12 +82,24 @@ namespace eosio {
     void buyname(uuid id, asset price, string active_key, string owner_key);
 //    // user decided to decline the name for a given price
 //    void declinename(uuid id);
+  
+  // ----------------------------------------------
+  // Actions for an admins
+  // ----------------------------------------------
+    [[eosio::action]]
+    void deleteconfig();
+    // modify the suffix table
+//    [[eosio::action]]
+//    void addsuffix();
+//    [[eosio::action]]
+//    void deletesuffix();
+  
 
   private:
   
     struct [[eosio::table("settings")]] Config {
       uuid last_id = 1;
-      asset	askdeposit = asset(2, symbol("EOS", 4));
+      asset	askdeposit = asset(2000, symbol("EOS", 4));
     };
     typedef singleton<name("settings"), Config> SingletonType;
     SingletonType ConfigSingleton;
