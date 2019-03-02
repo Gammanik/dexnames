@@ -202,6 +202,7 @@ void premium::declineask(uuid id, name admin) {
 void premium::buyname(uuid id, asset sent_amount, string active_key, string owner_key) {
   auto itr_resp = _responses.find(id);
   eosio_assert(itr_resp != _responses.end(), ("Buy name error: no response for a given ask id. id: " + std::to_string(id)).c_str());
+  eosio_assert(itr_resp->status == ASK_ACCEPTED, ("Buy name error: your ask should be accepted in order to buy the name"));
   
   Config conf = _get_config();
   

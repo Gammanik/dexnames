@@ -38,7 +38,8 @@ namespace eosio {
   class [[eosio::contract]] premium : public contract {
   public:
   
-    // ask decision responses
+    // ask decision responses //todo: make them as strings?
+//    const uint8_t ASK_ACCEPTED = "accepted";
     const uint8_t ASK_ACCEPTED = 0;
     const uint8_t ASK_DECLINED = 1;
     const uint8_t ASK_EXPIRED = 2;
