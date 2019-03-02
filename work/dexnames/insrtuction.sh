@@ -14,7 +14,7 @@ alias cleos='docker-compose exec keosd /opt/eosio/bin/cleos -u http://nodeosd:88
 
 # REG USER::
 cleos wallet create --to-console
-cleos wallet unlock --password PW5HypDWZ2y9ZdPSnUZSWoCtPc2p9e5QWs4DTh6vNGis2h3guYBBZ
+cleos wallet unlock --password PW5JMKKjfpdGJdaPnqM6bYcT4dfVBPZQL7ruzeap2LFiasWcdn2Vz
 
 
 

@@ -1,53 +1,213 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 22 15:55:37 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Mar  2 17:34:25 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
-            "name": "regname",
+            "name": "Config",
             "base": "",
             "fields": [
                 {
-                    "name": "newname",
-                    "type": "name"
+                    "name": "last_id",
+                    "type": "uuid"
                 },
                 {
-                    "name": "ownerkey",
-                    "type": "public_key"
-                },
-                {
-                    "name": "activekey",
-                    "type": "public_key"
+                    "name": "askdeposit",
+                    "type": "asset"
                 }
             ]
         },
         {
-            "name": "regname_type",
+            "name": "approveask",
             "base": "",
             "fields": [
                 {
-                    "name": "newname",
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "price",
+                    "type": "asset"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "askprice",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "ownerkey",
-                    "type": "public_key"
+                    "name": "nametobuy",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "asks_table",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
                 },
                 {
-                    "name": "activekey",
-                    "type": "public_key"
+                    "name": "nametobuy",
+                    "type": "name"
+                },
+                {
+                    "name": "requester",
+                    "type": "name"
+                },
+                {
+                    "name": "asktime",
+                    "type": "unix_time"
+                }
+            ]
+        },
+        {
+            "name": "declineask",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "deleteconfig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "message",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receiver",
+                    "type": "name"
+                },
+                {
+                    "name": "message",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "responses_table",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                },
+                {
+                    "name": "nametobuy",
+                    "type": "name"
+                },
+                {
+                    "name": "requester",
+                    "type": "name"
+                },
+                {
+                    "name": "asktime",
+                    "type": "unix_time"
+                },
+                {
+                    "name": "respondtime",
+                    "type": "unix_time"
+                },
+                {
+                    "name": "price",
+                    "type": "asset"
+                },
+                {
+                    "name": "status",
+                    "type": "uint8"
                 }
             ]
         }
     ],
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "unix_time",
+            "type": "uint32"
+        },
+        {
+            "new_type_name": "uuid",
+            "type": "uint64"
+        }
+    ],
     "actions": [
         {
-            "name": "regname",
-            "type": "regname",
+            "name": "approveask",
+            "type": "approveask",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "askprice",
+            "type": "askprice",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "declineask",
+            "type": "declineask",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "deleteconfig",
+            "type": "deleteconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "init",
+            "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "message",
+            "type": "message",
             "ricardian_contract": ""
         }
     ],
-    "tables": [],
+    "tables": [
+        {
+            "name": "asks",
+            "type": "asks_table",
+            "index_type": "i64",
+            "key_names": [ "id" ],
+            "key_types": [ "uuid" ]
+        },
+        {
+            "name": "responses",
+            "type": "responses_table",
+            "index_type": "i64",
+            "key_names": [ "id" ],
+            "key_types": [ "uuid" ]
+        },
+        {
+            "name": "settings",
+            "type": "Config",
+            "index_type": "i64",
+            "key_names": [ "id" ],
+            "key_types": [ "uuid" ]
+        }
+    ],
     "ricardian_clauses": [],
     "variants": [],
     "abi_extensions": []
