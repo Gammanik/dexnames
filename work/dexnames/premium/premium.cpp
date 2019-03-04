@@ -92,9 +92,8 @@ void premium::handle_transfer(name from, name to, asset quantity, string memo) {
   
   
   if (transfer_code == "ask:") {
-//    const string owner_key = memo.substr(0, KEY_LENGTH);
-//    const string active_key = memo.substr(KEY_LENGTH + 1, 2*KEY_LENGTH + 1);
-    
+    Config conf = _get_config();
+    eosio_assert(conf.askdeposit == quantity, ("Handle transfer err: wrong deposit amount. Ask deposit is: " + std::to_string(conf.askdeposit.amount)).c_str());
     const name nameasked = name(memo.substr(0, memo.length()));
     askprice(from, nameasked);
   } else if (transfer_code == "buy:") {
@@ -123,9 +122,9 @@ void premium::handle_transfer(name from, name to, asset quantity, string memo) {
 void premium::askprice(const name requester, const name nametobuy) {
   // check the rules
   eosio_assert(has_auth(requester), "Ask price Error: You're not who you say you are.");
+  eosio_assert(!is_account(nametobuy), "Ask price Error: The payment account you are requesting is already exists.");
   
-  // increment the uuid of the ask
-  
+//   increment the uuid of the ask
   uuid new_id = _next_id();
   
   // Cannot charge RAM to other accounts during notify
@@ -136,8 +135,13 @@ void premium::askprice(const name requester, const name nametobuy) {
     a.asktime = now();
   });
   
-  // todo: add deferred action in 3 days call expired ask
-  
+  Config conf = _get_config();
+  // deferred action in 3 days call expired ask
+  transaction out{};
+  out.actions.emplace_back(permission_level{_self, name("active")}, name(_self), name("expireask"),
+                           std::make_tuple(new_id));
+  out.delay_sec = conf.askexpiration; // todo: conf.askexpiration;
+  out.send(new_id, _self);
   
 }
 
@@ -162,8 +166,8 @@ void premium::approveask(uuid id, asset price, name admin) {
     a.status = ASK_ACCEPTED;
     a.nametobuy = itr_ask->nametobuy;
     a.requester = itr_ask->requester;
-    a.asktime = a.asktime;
-    a.respondtime = a.respondtime;
+    a.asktime = itr_ask->asktime;
+    a.respondtime = now();
     a.price = price;
   });
 
@@ -171,8 +175,17 @@ void premium::approveask(uuid id, asset price, name admin) {
   
   send_message(itr_ask->requester, "Nameos: your ask was approved. You have 3 days to buy the name");
   
+  // todo: cancel expireask
+//  cancel_deferred()
   
   // todo: check if 3 days yet not expired (just in case)
+  // todo: add deferred expirebuy
+//  Config conf = _get_config();
+//  transaction out{};
+//  out.actions.emplace_back(permission_level{_self, name("active")}, name(_self), name("expirebuy"),
+//                           std::make_tuple(new_id));
+//  out.delay_sec = 10; // todo: conf.askexpiration;
+//  out.send(new_id, _self);
 }
 
 void premium::declineask(uuid id, name admin) {
@@ -186,17 +199,64 @@ void premium::declineask(uuid id, name admin) {
     a.status = ASK_DECLINED;
     a.nametobuy = itr_ask->nametobuy;
     a.requester = itr_ask->requester;
-    a.asktime = a.asktime;
-    a.respondtime = a.respondtime;
-    a.price = asset(-1, symbol("EOS", 4));
+    a.asktime = itr_ask->asktime;
+    a.respondtime = now(); // todo: now() is returning 0??
+    a.price = asset(0, symbol("EOS", 4)); // todo: figure out
   });
   
+  Config conf = _get_config();
+  // send the deposit amount back
+  action(permission_level{_self, name("active")},
+    name("eosio.token"), name("transfer"),
+    std::make_tuple(_self, itr_ask->requester, conf.askdeposit,
+       std::string("Nameos: Your request was declined. Return deposit for a name: " + itr_ask->nametobuy.to_string())))
+    .send();
+  
+  
   _asks.erase(itr_ask);
-  
-  
   send_message(itr_ask->requester, "Nameos: your ask was declined. Sorry.");
-  // todo: send the pledge back
   
+  // todo: cancel expireask
+//  cancel_deferred(id)
+
+}
+
+void premium::expireask(uuid id) {
+  
+  auto itr_ask = _asks.find(id);
+  eosio_assert(itr_ask != _asks.end(), ("Expire ask error: ask with a given id does not exists. id: " + std::to_string(id)).c_str());
+  eosio_assert(has_auth(_self) || has_auth(itr_ask->requester), "Expire ask Error: Only requester or contract can execute this actions.");
+  
+  // it will fall if response is already given
+  _responses.emplace(_self, [&](responses_table &a) {
+    a.id = id;
+    a.status = ASK_EXPIRED;
+    a.nametobuy = itr_ask->nametobuy;
+    a.requester = itr_ask->requester;
+    a.asktime = itr_ask->asktime;
+    a.respondtime = now();
+    a.price = asset(0, symbol("EOS", 4));
+  });
+  
+  Config conf = _get_config();
+  // send the deposit amount back
+  action(permission_level{_self, name("active")},
+         name("eosio.token"), name("transfer"),
+         std::make_tuple(_self, itr_ask->requester, conf.askdeposit,
+                         std::string("Nameos: Your request has expired. Return deposit for a name: " + itr_ask->nametobuy.to_string())))
+          .send();
+  
+  // just remove the ask from the table
+  _asks.erase(itr_ask);
+}
+
+void premium::tstexp(uuid id) {
+  Config conf = _get_config();
+  transaction out{};
+  out.actions.emplace_back(permission_level{_self, name("active")}, name(_self), name("message"),
+                           std::make_tuple(name("nameswapsaa1"), string("Hello with a delay")));
+  out.delay_sec = 10;
+  out.send(id, _self);
 }
 
 void premium::buyname(uuid id, asset sent_amount, string active_key, string owner_key) {
@@ -207,11 +267,22 @@ void premium::buyname(uuid id, asset sent_amount, string active_key, string owne
   Config conf = _get_config();
   
   // check for the price
+  // TODO:::  the amount is divided by 10. Why??
   eosio_assert(sent_amount != itr_resp->price - conf.askdeposit, ("Wrong amount sent. You need to transfer:" + std::to_string(itr_resp->price.amount - conf.askdeposit.amount)).c_str());
   regname(itr_resp->nametobuy , active_key, owner_key);
   
   _responses.erase(itr_resp);
   send_message(itr_resp->requester, "Nameos: thank you for buying premium name. Come again!");
+}
+
+void premium::declinebuy(uuid id) {
+  auto itr_resp = _responses.find(id);
+  eosio_assert(itr_resp != _responses.end(), ("Decline error: no response for a given ask id. id: " + std::to_string(id)).c_str());
+  eosio_assert(itr_resp->status == ASK_ACCEPTED, ("Decline error: your ask should be accepted in order to decline it"));
+  
+  // todo: add a stats table like: num_declined, num_sold
+  send_message(itr_resp->requester, string("Nameos: you declined a name: " + itr_resp->nametobuy.to_string()));
+  _responses.erase(itr_resp);
 }
 
 
@@ -275,11 +346,33 @@ void premium::deleteconfig() {
   ConfigSingleton.remove();
 }
 
+void premium::droptable(string table) {
+  if (table == "asks") {
+    for(auto itr = _asks.begin(); itr != _asks.end();) {
+      itr = _asks.erase(itr);
+    }
+  } else if (table == "responses") {
+    for(auto itr = _responses.begin(); itr != _responses.end();) {
+      itr = _responses.erase(itr);
+    }
+  } else {
+    eosio_assert(false, ("nameos: no option to delete table: " + table).c_str());
+  }
+}
+
+void premium::fixid(const uuid newid) {
+  eosio_assert(has_auth(_self), "Only a contract owner can fix the id");
+  
+  Config state = _get_config();
+  state.last_id = newid;
+  eosio_assert(state.last_id > 0, "_next_id overflow detected");
+  _update_config(state);
+}
 
 
 
-extern "C"
-{
+
+extern "C" {
 void apply(uint64_t receiver, uint64_t code, uint64_t action) {
   
   if (code == name("eosio.token").value && action == name("transfer").value) {
@@ -291,9 +384,16 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
     execute_action(name(receiver), name(code), &premium::approveask);
   } else if (code == receiver && action == name("declineask").value) {
     execute_action(name(receiver), name(code), &premium::declineask);
+  } else if (code == receiver && action == name("expireask").value) {
+    execute_action(name(receiver), name(code), &premium::expireask);
+    
     
   } else if (code == receiver && action == name("askprice").value) {
     execute_action(name(receiver), name(code), &premium::askprice);
+  
+    /// for a user
+  } else if (code == receiver && action == name("declinebuy").value) {
+    execute_action(name(receiver), name(code), &premium::declinebuy);
     
     
     /// for an admin
@@ -301,8 +401,19 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
     execute_action(name(receiver), name(code), &premium::deleteconfig);
   } else if (code == receiver && action == name("init").value) {
     execute_action(name(receiver), name(code), &premium::init);
+  } else if (code == receiver && action == name("droptable").value) {
+    execute_action(name(receiver), name(code), &premium::droptable);
+    
+    
+    /// testing purposes
+  } else if (code == receiver && action == name("tstexp").value) {
+    execute_action(name(receiver), name(code), &premium::tstexp);
   }
-
+  
+  
+  
+  
+  eosio_exit(0);
 }
 
 

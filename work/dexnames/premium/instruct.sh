@@ -18,7 +18,7 @@ cleos --url http://jungle2.cryptolions.io:80 push action premiumtest1 regname '{
 cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '{"from":"collectmoney", "to":"premiumtest1", "quantity":"2.0000 EOS", "memo":"ask:namesw12.sex"}' -p collectmoney
 
 
-cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 askprice '{"account":"premiumtest1", "nametobuy": "nameswap.sex"}' -p premiumtest1
+cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 askprice '{"account":"collectmoney", "nametobuy": "pornpnr1.sex"}' -p collectmoney
 cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 approveask '{"id":"5", "price":"1.0001 EOS", "admin": "premiumtest1"}' -p premiumtest1
 
 
@@ -28,7 +28,20 @@ cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 approveask '{
 
 
  steps::::
- cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '{"from":"collectmoney", "to":"premiumtest1", "quantity":"2.0000 EOS", "memo":"ask:namesw12.sex"}' -p collectmoney
- cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 approveask '{"id":"2", "price":"4.0001 EOS", "admin": "premiumtest1"}' -p premiumtest1
 
-  cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '{"from":"collectmoney", "to":"premiumtest1", "quantity":"2.0000 EOS", "memo":"buy:2,EOS53Ad9acDA2mQZXDGmpJxB5MBopDoLY99qS4RoNs8D2SBXosoJx,EOS53Ad9acDA2mQZXDGmpJxB5MBopDoLY99qS4RoNs8D2SBXosoJx"}' -p collectmoney
+// ask for a name
+ cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '{"from":"collectmoney", "to":"premiumtest1", "quantity":"0.2000 EOS", "memo":"ask:namesw22.sex"}' -p collectmoney
+
+// admin respond
+ cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 approveask '{"id":"17", "price":"5.0000 EOS", "admin": "premiumtest1"}' -p premiumtest1
+  cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 declineask '{"id":"16", "admin": "premiumtest1"}' -p premiumtest1
+
+// user decides
+  cleos --url http://jungle2.cryptolions.io:80 push action eosio.token transfer '{"from":"collectmoney", "to":"premiumtest1", "quantity":"3.8000 EOS", "memo":"buy:15,EOS53Ad9acDA2mQZXDGmpJxB5MBopDoLY99qS4RoNs8D2SBXosoJx,EOS53Ad9acDA2mQZXDGmpJxB5MBopDoLY99qS4RoNs8D2SBXosoJx"}' -p collectmoney
+  cleos --url http://jungle.eosbcn.com:8080 push action premiumtest1 declinebuy '{"id":"17"}' -p premiumtest1
+
+
+
+
+
+

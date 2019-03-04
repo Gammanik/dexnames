@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Mar  2 17:34:25 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Mar  4 17:35:59 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -13,6 +13,14 @@
                 {
                     "name": "askdeposit",
                     "type": "asset"
+                },
+                {
+                    "name": "askexpiration",
+                    "type": "unix_time"
+                },
+                {
+                    "name": "responseexp",
+                    "type": "unix_time"
                 }
             ]
         },
@@ -85,9 +93,49 @@
             ]
         },
         {
+            "name": "declinebuy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                }
+            ]
+        },
+        {
             "name": "deleteconfig",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "droptable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "table",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "expireask",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                }
+            ]
+        },
+        {
+            "name": "fixid",
+            "base": "",
+            "fields": [
+                {
+                    "name": "newid",
+                    "type": "uuid"
+                }
+            ]
         },
         {
             "name": "init",
@@ -141,12 +189,22 @@
                     "type": "uint8"
                 }
             ]
+        },
+        {
+            "name": "tstexp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uuid"
+                }
+            ]
         }
     ],
     "types": [
         {
             "new_type_name": "unix_time",
-            "type": "uint32"
+            "type": "uint64"
         },
         {
             "new_type_name": "uuid",
@@ -170,8 +228,28 @@
             "ricardian_contract": ""
         },
         {
+            "name": "declinebuy",
+            "type": "declinebuy",
+            "ricardian_contract": ""
+        },
+        {
             "name": "deleteconfig",
             "type": "deleteconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "droptable",
+            "type": "droptable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "expireask",
+            "type": "expireask",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fixid",
+            "type": "fixid",
             "ricardian_contract": ""
         },
         {
@@ -182,6 +260,11 @@
         {
             "name": "message",
             "type": "message",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tstexp",
+            "type": "tstexp",
             "ricardian_contract": ""
         }
     ],

@@ -9,6 +9,7 @@
 #include <eosiolib/public_key.hpp>
 #include <eosiolib/public_key.hpp>
 #include <eosiolib/crypto.h>
+#include <eosiolib/transaction.hpp>
 #include "includes/eosio.system.hpp"
 #include "includes/abieos_numeric.hpp"
 #include <string>
@@ -27,7 +28,7 @@ using std::array;
 namespace eosio {
   
   typedef uint64_t uuid;
-  typedef uint32_t unix_time;
+  typedef uint64_t unix_time;
   
 //  struct regname_type { // todo: DELETE THE SHIT
 //      name newname;
@@ -69,8 +70,12 @@ namespace eosio {
     void approveask(uuid id, asset price, name admin);
     [[eosio::action]] // admin declined
     void declineask(uuid id, name admin);
-//    [[eosio::action]] // if an ask has expired (3 days has gone)
-//    void expireask(uuid id);
+    [[eosio::action]] // if an ask has expired (3 days has gone)
+    void expireask(uuid id);
+    
+    // todo:: temporary
+    [[eosio::action]]
+    void tstexp(uuid id);
 //
 //    // managing the contract
 //    [[eosio::action]] // add a person who can make decisions (approve or reject asks)
@@ -81,14 +86,17 @@ namespace eosio {
     
     // user decided to buy the name for a given price
     void buyname(uuid id, asset price, string active_key, string owner_key);
-//    // user decided to decline the name for a given price
-//    void declinename(uuid id);
+    // user decided to decline the name for a given price
+    [[eosio::action]]
+    void declinebuy(uuid id);
   
   // ----------------------------------------------
   // Actions for an admins
   // ----------------------------------------------
     [[eosio::action]]
     void deleteconfig();
+    [[eosio::action]]
+    void droptable(string table);
     // modify the suffix table
 //    [[eosio::action]]
 //    void addsuffix();
@@ -101,6 +109,10 @@ namespace eosio {
     struct [[eosio::table("settings")]] Config {
       uuid last_id = 1;
       asset	askdeposit = asset(2000, symbol("EOS", 4));
+      // 3 days for ask expiration in seconds
+      unix_time askexpiration =  60; // todo: 3*24*36
+      // 3 days for response expiration in seconds
+      unix_time responseexp = 6000; // todo: 3*24*36
     };
     typedef singleton<name("settings"), Config> SingletonType;
     SingletonType ConfigSingleton;
@@ -109,6 +121,8 @@ namespace eosio {
     premium::Config _get_config();
     void _update_config(const premium::Config config);
     uuid _next_id();
+    [[eosio::action]]
+    void fixid(const uuid newid);
     
     void send_message(const name receiver, const string message);
     [[eosio::action]]
