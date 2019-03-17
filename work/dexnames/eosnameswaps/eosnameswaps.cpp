@@ -9,7 +9,7 @@ namespace eosio
 {
 
 // Action: Sell an account
-void eosnameswaps::sell(const sell_type &sell_data) {
+void nameos::sell(const sell_type &sell_data) {
     // ----------------------------------------------
     // Auth checks
     // ----------------------------------------------
@@ -101,7 +101,7 @@ void eosnameswaps::sell(const sell_type &sell_data) {
 }
 
 // Action: Buy an account listed for sale
-void eosnameswaps::handle_transfer(const transfer_type &transfer_data) {
+void nameos::handle_transfer(const transfer_type &transfer_data) {
     // ----------------------------------------------
     // Auth checks
     // ----------------------------------------------
@@ -166,11 +166,11 @@ void eosnameswaps::handle_transfer(const transfer_type &transfer_data) {
     }
 }
 
-void eosnameswaps::buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key) {
+void nameos::buy_custom(const uint64_t auction_guid, const name from, const asset quantity, const string owner_key, const string active_key) {
     eosio_assert(false, "Suffix sale is not supported yet");
 }
 
-void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key) {
+void nameos::buy_saleprice(const uint64_t auction_guid, const name from, const name to, const asset quantity, const string owner_key, const string active_key) {
 
     // ----------------------------------------------
     // Sale/Bid price
@@ -261,7 +261,7 @@ void eosnameswaps::buy_saleprice(const uint64_t auction_guid, const name from, c
 }
 
 // Action: Remove a listed account from sale
-void eosnameswaps::cancel(const cancel_type &cancel_data) {
+void nameos::cancel(const cancel_type &cancel_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -324,7 +324,7 @@ void eosnameswaps::cancel(const cancel_type &cancel_data) {
 }
 
 // Action: Update the sale price
-void eosnameswaps::updatesale(const updatesale_type &updatesale_data) {
+void nameos::updatesale(const updatesale_type &updatesale_data) {
 
     // Check an account with that name is listed for sale
     auto itr_accounts = _accounts.find(updatesale_data.account4sale.value);
@@ -365,7 +365,7 @@ void eosnameswaps::updatesale(const updatesale_type &updatesale_data) {
 }
 
 // Action: Increment votes
-void eosnameswaps::vote(const vote_type &vote_data) {
+void nameos::vote(const vote_type &vote_data) {
     // Confirm the voter is who they say they are
     eosio_assert(has_auth(vote_data.voter), "Vote Error: You are not who you say you are. Check permissions.");
 
@@ -394,7 +394,7 @@ void eosnameswaps::vote(const vote_type &vote_data) {
 }
 
 // Action: Bid for an account
-void eosnameswaps::bid(const uint64_t auction_guid, const name bidder, const asset bidprice, const string owner_key, const string active_key) {
+void nameos::bid(const uint64_t auction_guid, const name bidder, const asset bidprice, const string owner_key, const string active_key) {
 
     // ----------------------------------------------
     // Valid transaction checks
@@ -447,7 +447,7 @@ void eosnameswaps::bid(const uint64_t auction_guid, const name bidder, const ass
         string(" has received a bid. If you choose to accept it, you'll get the XX EOS. Others can still bid higher or pay the full sale price until then."));
 }
 
-void eosnameswaps::cancelbid(const cancelbid_type &cancelbid_data) {
+void nameos::cancelbid(const cancelbid_type &cancelbid_data) {
 	    // ----------------------------------------------
         // Auth checks
         // ----------------------------------------------
@@ -508,7 +508,7 @@ void eosnameswaps::cancelbid(const cancelbid_type &cancelbid_data) {
 }
 
 // Action: Accept or decline a bid for an account. paymentaccnt has to decide
-void eosnameswaps::decidebid(const decidebid_type &decidebid_data) {
+void nameos::decidebid(const decidebid_type &decidebid_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -599,7 +599,7 @@ void eosnameswaps::decidebid(const decidebid_type &decidebid_data) {
 }
 
 // Message Action
-void eosnameswaps::message(const message_type &message_data) {
+void nameos::message(const message_type &message_data) {
 
     // ----------------------------------------------
     // Auth checks
@@ -615,7 +615,7 @@ void eosnameswaps::message(const message_type &message_data) {
 }
 
 // Action: Perform admin tasks
-void eosnameswaps::screener(const screener_type &screener_data) {
+void nameos::screener(const screener_type &screener_data) {
 
     // Only the contract account can perform screening
     require_auth(_self);
@@ -634,7 +634,7 @@ void eosnameswaps::screener(const screener_type &screener_data) {
 }
 
 // Init the stats table
-void eosnameswaps::initstats() {
+void nameos::initstats() {
 
     // ----------------------------------------------
     // Auth checks
@@ -666,7 +666,7 @@ void eosnameswaps::initstats() {
 }
 
 // Broadcast message
-void eosnameswaps::send_message(name receiver, string message) {
+void nameos::send_message(name receiver, string message) {
 
     action(permission_level{_self, name("active")},
            name(_self), name("message"),
@@ -677,7 +677,7 @@ void eosnameswaps::send_message(name receiver, string message) {
 }
 
 // Changes the owner/active permissions
-void eosnameswaps::account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey_str) {
+void nameos::account_auth(name account4sale, name changeto, name perm_child, name perm_parent, string pubkey_str) {
 
     // Setup authority for contract. Choose either a new key, or account, or both.
     authority contract_authority;
@@ -727,7 +727,7 @@ void eosnameswaps::account_auth(name account4sale, name changeto, name perm_chil
 } // namespace eosio
 
 
-//void eosnameswaps::erasetables() {
+//void nameos::erasetables() {
 //	// Only the contract account can init the stats table
 //    require_auth(_self);
 
@@ -745,43 +745,43 @@ extern "C"
 
         if (code == name("eosio.token").value && action == name("transfer").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::handle_transfer);
+            execute_action(name(receiver), name(code), &nameos::handle_transfer);
         }
         else if (code == receiver && action == name("sell").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::sell);
+            execute_action(name(receiver), name(code), &nameos::sell);
         }
         else if (code == receiver && action == name("cancel").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::cancel);
+            execute_action(name(receiver), name(code), &nameos::cancel);
         }
         else if (code == receiver && action == name("updatesale").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::updatesale);
+            execute_action(name(receiver), name(code), &nameos::updatesale);
         }
         else if (code == receiver && action == name("vote").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::vote);
+            execute_action(name(receiver), name(code), &nameos::vote);
         }
         else if (code == receiver && action == name("decidebid").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::decidebid);
+            execute_action(name(receiver), name(code), &nameos::decidebid);
         }
         else if (code == receiver && action == name("message").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::message);
+            execute_action(name(receiver), name(code), &nameos::message);
         }
         else if (code == receiver && action == name("screener").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::screener);
+            execute_action(name(receiver), name(code), &nameos::screener);
         }
         else if (code == receiver && action == name("initstats").value)
         {
-            execute_action(name(receiver), name(code), &eosnameswaps::initstats);
+            execute_action(name(receiver), name(code), &nameos::initstats);
         }
         else if (code == receiver && action == name("cancelbid").value)
 	    {
-	        execute_action(name(receiver), name(code), &eosnameswaps::cancelbid);
+	        execute_action(name(receiver), name(code), &nameos::cancelbid);
 	    }
         eosio_exit(0);
     }

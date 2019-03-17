@@ -120,7 +120,7 @@ struct transfer_type
     string memo;
 };
 
-class [[eosio::contract]] eosnameswaps : public contract
+class [[eosio::contract]] nameos : public contract
 {
 
   public:
@@ -133,7 +133,7 @@ class [[eosio::contract]] eosnameswaps : public contract
     const uint16_t BID_ACCEPTED = 2;
 
     // Constructor
-    eosnameswaps(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds),
+    nameos(name self,name code, datastream<const char*> ds) : eosio::contract(self,code,ds),
     _accounts(_self,_self.value),
     _sold(_self, _self.value),
     _extras(_self,_self.value),
