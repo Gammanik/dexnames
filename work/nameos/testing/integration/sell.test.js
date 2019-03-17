@@ -21,7 +21,7 @@ const expect = require('chai').expect;
 
 
 const contractAccount = 'nameswapsln1'
-const contractName = 'eosnameswaps'
+const contractName = 'nameos'
 
 createTestCases = function(eos) {
 

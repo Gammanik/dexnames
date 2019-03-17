@@ -1,6 +1,6 @@
 # in case of ucing CLion
 .idea/
-cmake-build-debug/
+./cmake-build-debug/
 
 **/.DS_Store
 **/.wasm
