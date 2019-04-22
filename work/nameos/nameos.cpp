@@ -97,7 +97,7 @@ void nameos::sell(const sell_type &sell_data) {
     });
     
     // Send message
-    send_message(sell_data.paymentaccnt, string("EOSNameSwaps: Your account ") + name{sell_data.account4sale}.to_string() + string(" has been listed for sale. Keep an eye out for bids, and don't forget to vote for accounts you like!"));
+    send_message(sell_data.paymentaccnt, string("nameos.io: Your account ") + name{sell_data.account4sale}.to_string() + string(" has been listed for sale. Keep an eye out for bids, and don't forget to vote for accounts you like!"));
 }
 
 // Action: Buy an account listed for sale
@@ -199,14 +199,14 @@ void nameos::buy_saleprice(const uint64_t auction_guid, const name from, const n
     action(
         permission_level{_self, name("active")},
         name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, feesaccount, contractfee, std::string("EOSNameSwaps: Account contract fee: ") + itr_accounts->account4sale.to_string()))
+        std::make_tuple(_self, feesaccount, contractfee, std::string("nameos.io: Account contract fee: ") + itr_accounts->account4sale.to_string()))
         .send();
 
     // Transfer EOS from contract to seller minus the contract fees
     action(
         permission_level{_self, name("active")},
         name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, itr_accounts->paymentaccnt, sellerfee, std::string("EOSNameSwaps: Account seller fee: ") + itr_accounts->account4sale.to_string()))
+        std::make_tuple(_self, itr_accounts->paymentaccnt, sellerfee, std::string("nameos.io: Account seller fee: ") + itr_accounts->account4sale.to_string()))
         .send();
 
     // ----------------------------------------------
@@ -291,7 +291,7 @@ void nameos::cancel(const cancel_type &cancel_data) {
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
             std::make_tuple(_self, itr_bids->bidder, itr_bids->bidprice,
-            std::string("EOSNameSwaps: The auction name:") +
+            std::string("nameos.io: The auction name:") +
             itr_accounts->account4sale.to_string() +
             std::string(" was cancelled by seller. Refunding your bid.")))
         .send();
