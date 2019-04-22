@@ -320,7 +320,7 @@ void nameos::cancel(const cancel_type &cancel_data) {
     });
 
     // Send message
-    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: You have successfully cancelled the sale of the account ") + name{itr_accounts->account4sale}.to_string() + string(". Please come again."));
+    send_message(itr_accounts->paymentaccnt, string("nameos.io: You have successfully cancelled the sale of the account ") + name{itr_accounts->account4sale}.to_string() + string(". Please come again."));
 }
 
 // Action: Update the sale price
@@ -361,7 +361,7 @@ void nameos::updatesale(const updatesale_type &updatesale_data) {
     });
 
     // Send message
-    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: You have successfully updated the sale of the account ") + name{updatesale_data.account4sale}.to_string());
+    send_message(itr_accounts->paymentaccnt, string("nameos.io: You have successfully updated the sale of the account ") + name{updatesale_data.account4sale}.to_string());
 }
 
 // Action: Increment votes
@@ -424,7 +424,7 @@ void nameos::bid(const uint64_t auction_guid, const name bidder, const asset bid
         action(
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, itr_bids->paymentaccnt, itr_bids->bidprice, std::string("EOSNameSwaps: auction: ") + itr_accounts->account4sale.to_string() + std::string(". you were re-bided. Refunding your bid.")))
+            std::make_tuple(_self, itr_bids->paymentaccnt, itr_bids->bidprice, std::string("nameos.io: auction: ") + itr_accounts->account4sale.to_string() + std::string(". you were re-bided. Refunding your bid.")))
             .send();
     }
 
@@ -442,7 +442,7 @@ void nameos::bid(const uint64_t auction_guid, const name bidder, const asset bid
     });
 
     // Send message
-    send_message(itr_accounts->paymentaccnt, string("EOSNameSwaps: Your account ") +
+    send_message(itr_accounts->paymentaccnt, string("nameos.io: Your account ") +
         name{itr_accounts->account4sale}.to_string() +
         string(" has received a bid. If you choose to accept it, you'll get the XX EOS. Others can still bid higher or pay the full sale price until then."));
 }
@@ -478,7 +478,7 @@ void nameos::cancelbid(const cancelbid_type &cancelbid_data) {
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
             std::make_tuple(_self, feesaccount, cancelbidfee,
-                std::string("EOSNameSwaps: Cancel bid fee by: ") + itr_bids->bidder.to_string() +
+                std::string("nameos.io: Cancel bid fee by: ") + itr_bids->bidder.to_string() +
                 std::string(". For the account: ") + itr_accounts->account4sale.to_string()))
             .send();
 
@@ -487,7 +487,7 @@ void nameos::cancelbid(const cancelbid_type &cancelbid_data) {
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
             std::make_tuple(_self, itr_bids->bidder, bidderfee,
-                std::string("EOSNameSwaps: Bid refund fee for the auction: ") + itr_accounts->account4sale.to_string()))
+                std::string("nameos.io: Bid refund fee for the auction: ") + itr_accounts->account4sale.to_string()))
             .send();
 
 
@@ -553,14 +553,14 @@ void nameos::decidebid(const decidebid_type &decidebid_data) {
         action(
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, feesaccount, contractfee, std::string("EOSNameSwaps: Account contract fee. Accept bid for: ") + itr_accounts->account4sale.to_string()))
+            std::make_tuple(_self, feesaccount, contractfee, std::string("nameos.io: Account contract fee. Accept bid for: ") + itr_accounts->account4sale.to_string()))
             .send();
 
         // Transfer EOS from contract to seller minus the contract fees
         action(
             permission_level{_self, name("active")},
             name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, itr_accounts->paymentaccnt, sellerfee, std::string("EOSNameSwaps: Account seller fee. Accept bid for: ") + itr_accounts->account4sale.to_string()))
+            std::make_tuple(_self, itr_accounts->paymentaccnt, sellerfee, std::string("nameos.io: Account seller fee. Accept bid for: ") + itr_accounts->account4sale.to_string()))
             .send();
 
 	    // ----------------------------------------------
@@ -594,7 +594,7 @@ void nameos::decidebid(const decidebid_type &decidebid_data) {
         });
 
         // Send message
-        send_message(itr_bids->bidder, string("EOSNameSwaps: Your bid for ") + name{itr_accounts->account4sale}.to_string() + string(" has been rejected. Increase your bid offer"));
+        send_message(itr_bids->bidder, string("nameos.io: Your bid for ") + name{itr_accounts->account4sale}.to_string() + string(" has been rejected. Increase your bid offer"));
     }
 }
 
